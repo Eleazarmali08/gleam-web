@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produk - Gleam Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B8960C' },
+                        luxury: { dark: '#1A1A1A', surface: '#2D2D2D', light: '#F8F9FA' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #F8F9FA;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .sidebar {
+            background: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-inactive {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+    </style>
+</head>
+
+<body class="flex">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 text-white p-6 flex flex-col" role="navigation">
+        <div class="text-2xl font-bold text-gold-500 mb-8">GLEAM</div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📊 Dashboard</a>
+            <a href="products.html" class="flex items-center gap-3 px-4 py-3 bg-gold-500 rounded-xl text-white">📦
+                Produk</a>
+            <a href="orders.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📋 Pesanan</a>
+            <a href="customers.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">👥 Pelanggan</a>
+            <a href="analytics.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📊 Analitik</a>
+            <a href="settings.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">⚙️ Pengaturan</a>
+        </nav>
+        <button onclick="logout()"
+            class="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl mt-auto">🚪
+            Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-luxury-dark">Manajemen Produk</h1>
+                <p class="text-gray-500">Kelola semua produk emas & perhiasan</p>
+            </div>
+            <button onclick="openAddModal()"
+                class="btn-gold px-6 py-3 rounded-xl font-semibold flex items-center gap-2">
+                ➕ Tambah Produk
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="card p-4 mb-6 flex gap-4 flex-wrap">
+            <input type="text" id="searchInput" placeholder="🔍 Cari produk..."
+                class="px-4 py-2 border rounded-xl flex-1 min-w-[200px] focus:outline-none focus:border-gold-500"
+                oninput="loadProducts()">
+            <select id="categoryFilter" onchange="loadProducts()"
+                class="px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                <option value="">Semua Kategori</option>
+            </select>
+            <select id="statusFilter" onchange="loadProducts()"
+                class="px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                <option value="">Semua Status</option>
+                <option value="true">Aktif</option>
+                <option value="false">Nonaktif</option>
+            </select>
+        </div>
+
+        <!-- Products Table -->
+        <div class="card overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-500 text-sm border-b bg-gray-50">
+                        <th class="p-4">Produk</th>
+                        <th class="p-4">Kategori</th>
+                        <th class="p-4">Harga</th>
+                        <th class="p-4">Stok</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-gray-400">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="productModal" class="modal">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalTitle" class="text-xl font-bold">Tambah Produk</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="productId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                        <input type="text" id="productName" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                        <input type="number" id="productPrice" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Berat (gram)</label>
+                        <input type="number" step="0.1" id="productWeight" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Karat</label>
+                        <select id="productKarat" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                            <option value="18K">18K</option>
+                            <option value="22K">22K</option>
+                            <option value="24K">24K</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                        <input type="number" id="productStock" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                        <select id="productCategory" required
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500"></select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <textarea id="productDesc" rows="3"
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Featured</label>
+                        <input type="checkbox" id="productFeatured" class="w-5 h-5 text-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Aktif</label>
+                        <input type="checkbox" id="productActive" checked class="w-5 h-5 text-gold-500">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gambar Produk</label>
+                        <input type="file" id="productImage" accept="image/*"
+                            class="w-full px-4 py-2 border rounded-xl">
+                        <div id="imagePreview" class="mt-2 flex gap-2"></div>
+                    </div>
+                </div>
+                <div class="flex gap-3 justify-end mt-6">
+                    <button type="button" onclick="closeModal()"
+                        class="px-6 py-2 border border-gray-300 rounded-xl">Batal</button>
+                    <button type="submit" class="btn-gold px-6 py-2 rounded-xl font-semibold">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        // Auth Check
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+        }
+        checkAuth();
+
+        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+
+        // Load Categories
+        async function loadCategories() {
+            const { data } = await supabase.from('categories').select('*').order('display_order');
+            const select = document.getElementById('productCategory');
+            const filter = document.getElementById('categoryFilter');
+            select.innerHTML = data?.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '';
+            filter.innerHTML = '<option value="">Semua Kategori</option>' + (data?.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '');
+        }
+
+        // Load Products
+        async function loadProducts() {
+            const search = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            let query = supabase.from('products').select('*, categories(name), product_images(image_url, is_primary)').order('created_at', { ascending: false });
+
+            if (search) query = query.ilike('name', `%${search}%`);
+            if (category) query = query.eq('category_id', category);
+            if (status) query = query.eq('is_active', status === 'true');
+
+            const { data: products } = await query;
+
+            document.getElementById('productsTableBody').innerHTML = products?.map(p => {
+                const primaryImage = p.product_images?.find(i => i.is_primary)?.image_url || p.product_images?.[0]?.image_url;
+                return `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${primaryImage || 'https://placehold.co/48x48/D4AF37/FFFFFF?text=No'}" 
+                                class="w-12 h-12 rounded-lg object-cover" onerror="this.src='https://placehold.co/48x48/D4AF37/FFFFFF?text=No'">
+                            <div>
+                                <div class="font-medium">${p.name}</div>
+                                <div class="text-xs text-gray-500">${p.karat} • ${p.weight}g</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-sm">${p.categories?.name || '-'}</td>
+                    <td class="p-4 text-sm font-medium">Rp ${p.price?.toLocaleString('id-ID')}</td>
+                    <td class="p-4 text-sm">${p.stock}</td>
+                    <td class="p-4">
+                        <span class="status-badge ${p.is_active ? 'status-active' : 'status-inactive'}">
+                            ${p.is_active ? 'Aktif' : 'Nonaktif'}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex gap-2">
+                            <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700">✏️</button>
+                            <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-orange-500 hover:text-orange-700">🔄</button>
+                            <button onclick="deleteProduct('${p.id}')" class="text-red-500 hover:text-red-700">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="6" class="p-8 text-center text-gray-400">Tidak ada produk</td></tr>';
+        }
+
+        // Add Product
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Produk';
+            document.getElementById('productId').value = '';
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        // Edit Product
+        async function editProduct(id) {
+            const { data: product } = await supabase.from('products').select('*, product_images(*)').eq('id', id).single();
+            if (!product) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Produk';
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productWeight').value = product.weight;
+            document.getElementById('productKarat').value = product.karat;
+            document.getElementById('productStock').value = product.stock;
+            document.getElementById('productCategory').value = product.category_id || '';
+            document.getElementById('productDesc').value = product.description || '';
+            document.getElementById('productFeatured').checked = product.is_featured;
+            document.getElementById('productActive').checked = product.is_active;
+
+            // Preview images
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = product.product_images?.map(i =>
+                `<img src="${i.image_url}" class="w-16 h-16 rounded-lg object-cover">`
+            ).join('') || '';
+
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        // Save Product
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const data = {
+                name: document.getElementById('productName').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                weight: parseFloat(document.getElementById('productWeight').value),
+                karat: document.getElementById('productKarat').value,
+                stock: parseInt(document.getElementById('productStock').value),
+                category_id: document.getElementById('productCategory').value || null,
+                description: document.getElementById('productDesc').value,
+                is_featured: document.getElementById('productFeatured').checked,
+                is_active: document.getElementById('productActive').checked,
+            };
+
+            if (id) {
+                await supabase.from('products').update(data).eq('id', id);
+            } else {
+                data.slug = data.name.toLowerCase().replace(/\s+/g, '-');
+                await supabase.from('products').insert(data);
+            }
+
+            // Upload image if selected
+            const imageFile = document.getElementById('productImage').files[0];
+            if (imageFile) {
+                const fileName = `${Date.now()}_${imageFile.name}`;
+                await supabase.storage.from('product-images').upload(fileName, imageFile);
+                const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+
+                // Insert product image
+                const { data: newProduct } = await supabase.from('products').select('id').eq('slug', data.slug).single();
+                if (newProduct) {
+                    await supabase.from('product_images').insert({
+                        product_id: newProduct.id,
+                        image_url: publicUrl,
+                        is_primary: true
+                    });
+                }
+            }
+
+            closeModal();
+            loadProducts();
+        });
+
+        // Toggle Status
+        async function toggleStatus(id, currentStatus) {
+            await supabase.from('products').update({ is_active: !currentStatus }).eq('id', id);
+            loadProducts();
+        }
+
+        // Delete Product
+        async function deleteProduct(id) {
+            if (confirm('Yakin hapus produk ini?')) {
+                await supabase.from('product_images').delete().eq('product_id', id);
+                await supabase.from('products').delete().eq('id', id);
+                loadProducts();
+            }
+        }
+
+        // Init
+        loadCategories();
+        loadProducts();
+    </script>
+</body>
+
+</html>

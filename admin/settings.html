@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - Gleam Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B8960C' },
+                        luxury: { dark: '#1A1A1A', surface: '#2D2D2D', light: '#F8F9FA' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #F8F9FA;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .sidebar {
+            background: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: white;
+        }
+
+        .tab-btn:not(.active) {
+            background: #F1F5F9;
+            color: #64748B;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="flex">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 text-white p-6 flex flex-col" role="navigation">
+        <div class="text-2xl font-bold text-gold-500 mb-8">GLEAM</div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📊 Dashboard</a>
+            <a href="products.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📦 Produk</a>
+            <a href="orders.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📋 Pesanan</a>
+            <a href="customers.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">👥 Pelanggan</a>
+            <a href="analytics.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📊 Analitik</a>
+            <a href="settings.html" class="flex items-center gap-3 px-4 py-3 bg-gold-500 rounded-xl text-white">⚙️
+                Pengaturan</a>
+        </nav>
+        <button onclick="logout()"
+            class="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl mt-auto">🚪
+            Logout</button>
+    </aside>
+
+    <!-- Ganti forms dengan semantic fieldset -->
+    <section aria-labelledby="store-settings-heading">
+        <h2 id="store-settings-heading" class="sr-only">Pengaturan Toko</h2>
+
+        <form id="storeForm" class="space-y-4" aria-label="Form informasi toko">
+            <fieldset>
+                <legend class="text-lg font-semibold mb-4">Informasi Toko</legend>
+
+                <div class="mb-4">
+                    <label for="storeName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nama Toko <span aria-hidden="true">*</span>
+                    </label>
+                    <input type="text" id="storeName" name="store_name" required aria-required="true"
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/50">
+                </div>
+
+                <div class="mb-4">
+                    <label for="storeEmail" class="block text-sm font-medium text-gray-700 mb-1">
+                        Email
+                    </label>
+                    <input type="email" id="storeEmail" name="store_email" autocomplete="email"
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/50">
+                </div>
+            </fieldset>
+
+            <button type="submit" class="btn-gold px-6 py-2 rounded-xl font-semibold"
+                aria-label="Simpan pengaturan toko">
+                💾 Simpan
+            </button>
+        </form>
+    </section>
+
+    <!-- Bank Accounts Tab -->
+    <div id="bankTab" class="tab-content">
+        <div class="card p-6 max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold">Rekening Bank</h3>
+                <button onclick="openBankModal()" class="btn-gold px-4 py-2 rounded-xl text-sm">➕ Tambah</button>
+            </div>
+            <div id="bankList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Admin Account Tab -->
+    <div id="accountTab" class="tab-content">
+        <div class="card p-6 max-w-2xl">
+            <h3 class="text-lg font-semibold mb-6">Ubah Password</h3>
+            <form id="passwordForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                    <input type="password" id="newPassword" required minlength="6"
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                    <input type="password" id="confirmPassword" required minlength="6"
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                </div>
+                <button type="submit" class="btn-gold px-6 py-2 rounded-xl font-semibold">Update Password</button>
+            </form>
+            <div id="passwordMessage" class="mt-4 text-sm"></div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Bank Modal -->
+    <div id="bankModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="bankModalTitle" class="text-lg font-semibold">Tambah Rekening</h3>
+                <button onclick="closeBankModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="bankForm" class="space-y-4">
+                <input type="hidden" id="bankId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Bank</label>
+                    <select id="bankName" required
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                        <option value="">Pilih Bank</option>
+                        <option value="BCA">BCA</option>
+                        <option value="Mandiri">Mandiri</option>
+                        <option value="BNI">BNI</option>
+                        <option value="BRI">BRI</option>
+                        <option value="BSI">BSI</option>
+                        <option value="CIMB Niaga">CIMB Niaga</option>
+                        <option value="Permata">Permata</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Rekening</label>
+                    <input type="text" id="bankNumber" required
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pemilik</label>
+                    <input type="text" id="bankHolder" required
+                        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-gold-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="bankActive" checked class="w-4 h-4 text-gold-500">
+                    <label class="text-sm text-gray-700">Aktif</label>
+                </div>
+                <div class="flex gap-3 justify-end mt-4">
+                    <button type="button" onclick="closeBankModal()"
+                        class="px-4 py-2 border border-gray-300 rounded-xl">Batal</button>
+                    <button type="submit" class="btn-gold px-4 py-2 rounded-xl">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+        }
+        checkAuth();
+
+        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            if (tab === 'bank') loadBanks();
+            if (tab === 'store') loadStoreInfo();
+        }
+
+        // Store Info
+        async function loadStoreInfo() {
+            const { data } = await supabase.from('settings').select('*').eq('key', 'store_info').single();
+            if (data?.value) {
+                const info = data.value;
+                document.getElementById('storeName').value = info.name || '';
+                document.getElementById('storeEmail').value = info.email || '';
+                document.getElementById('storePhone').value = info.phone || '';
+                document.getElementById('storeAddress').value = info.address || '';
+            }
+        }
+
+        document.getElementById('storeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const value = {
+                name: document.getElementById('storeName').value,
+                email: document.getElementById('storeEmail').value,
+                phone: document.getElementById('storePhone').value,
+                address: document.getElementById('storeAddress').value
+            };
+            const { data: existing } = await supabase.from('settings').select('*').eq('key', 'store_info').single();
+            if (existing) {
+                await supabase.from('settings').update({ value }).eq('key', 'store_info');
+            } else {
+                await supabase.from('settings').insert({ key: 'store_info', value });
+            }
+            alert('Informasi toko disimpan!');
+        });
+
+        // Bank Accounts
+        async function loadBanks() {
+            const { data } = await supabase.from('payment_accounts').select('*').order('display_order');
+            document.getElementById('bankList').innerHTML = data?.map(b => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                        <div class="font-semibold">${b.bank_name}</div>
+                        <div class="text-sm font-mono">${b.account_number}</div>
+                        <div class="text-xs text-gray-500">a/n ${b.account_holder}</div>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <span class="text-xs px-2 py-1 rounded-full ${b.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${b.is_active ? 'Aktif' : 'Nonaktif'}</span>
+                        <button onclick="editBank('${b.id}')" class="text-blue-500 hover:text-blue-700">✏️</button>
+                        <button onclick="deleteBank('${b.id}')" class="text-red-500 hover:text-red-700">🗑️</button>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-gray-400 text-center py-8">Belum ada rekening</p>';
+        }
+
+        function openBankModal() {
+            document.getElementById('bankModalTitle').textContent = 'Tambah Rekening';
+            document.getElementById('bankId').value = '';
+            document.getElementById('bankForm').reset();
+            document.getElementById('bankModal').classList.add('active');
+        }
+
+        function closeBankModal() {
+            document.getElementById('bankModal').classList.remove('active');
+        }
+
+        async function editBank(id) {
+            const { data } = await supabase.from('payment_accounts').select('*').eq('id', id).single();
+            if (!data) return;
+            document.getElementById('bankModalTitle').textContent = 'Edit Rekening';
+            document.getElementById('bankId').value = data.id;
+            document.getElementById('bankName').value = data.bank_name;
+            document.getElementById('bankNumber').value = data.account_number;
+            document.getElementById('bankHolder').value = data.account_holder;
+            document.getElementById('bankActive').checked = data.is_active;
+            document.getElementById('bankModal').classList.add('active');
+        }
+
+        document.getElementById('bankForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('bankId').value;
+            const data = {
+                bank_name: document.getElementById('bankName').value,
+                account_number: document.getElementById('bankNumber').value,
+                account_holder: document.getElementById('bankHolder').value,
+                is_active: document.getElementById('bankActive').checked
+            };
+            if (id) {
+                await supabase.from('payment_accounts').update(data).eq('id', id);
+            } else {
+                await supabase.from('payment_accounts').insert(data);
+            }
+            closeBankModal();
+            loadBanks();
+        });
+
+        async function deleteBank(id) {
+            if (confirm('Hapus rekening ini?')) {
+                await supabase.from('payment_accounts').delete().eq('id', id);
+                loadBanks();
+            }
+        }
+
+        // Password Change
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const msgEl = document.getElementById('passwordMessage');
+
+            if (newPassword !== confirmPassword) {
+                msgEl.textContent = 'Password tidak cocok!';
+                msgEl.className = 'text-red-500 mt-4';
+                return;
+            }
+
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) {
+                msgEl.textContent = 'Gagal: ' + error.message;
+                msgEl.className = 'text-red-500 mt-4';
+            } else {
+                msgEl.textContent = 'Password berhasil diubah!';
+                msgEl.className = 'text-green-500 mt-4';
+                document.getElementById('passwordForm').reset();
+            }
+        });
+
+        // Init
+        loadStoreInfo();
+    </script>
+</body>
+
+</html>

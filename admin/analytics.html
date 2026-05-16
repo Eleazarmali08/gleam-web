@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analitik - Gleam Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B8960C' },
+                        luxury: { dark: '#1A1A1A', surface: '#2D2D2D', light: '#F8F9FA' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #F8F9FA;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .sidebar {
+            background: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="flex">
+    <!-- Sidebar (sama) -->
+    <aside class="sidebar w-64 text-white p-6 flex flex-col" role="navigation">
+        <div class="text-2xl font-bold text-gold-500 mb-8">GLEAM</div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📊 Dashboard</a>
+            <a href="products.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📦 Produk</a>
+            <a href="orders.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">📋 Pesanan</a>
+            <a href="customers.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">👥 Pelanggan</a>
+            <a href="analytics.html" class="flex items-center gap-3 px-4 py-3 bg-gold-500 rounded-xl text-white">📊
+                Analitik</a>
+            <a href="settings.html"
+                class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl">⚙️ Pengaturan</a>
+        </nav>
+        <button onclick="logout()"
+            class="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl mt-auto">🚪
+            Logout</button>
+    </aside>
+
+    <main class="flex-1 p-8">
+        <h1 class="text-2xl font-bold text-luxury-dark mb-2">Analitik & Laporan</h1>
+        <p class="text-gray-500 mb-8">Visualisasi data penjualan dan performa toko</p>
+
+        <!-- Date Filter -->
+        <div class="card p-4 mb-8 flex gap-4 items-center">
+            <span class="text-sm font-medium">Periode:</span>
+            <button onclick="changePeriod('7')" class="px-4 py-2 rounded-xl bg-gold-500 text-white text-sm">7
+                Hari</button>
+            <button onclick="changePeriod('30')"
+                class="px-4 py-2 rounded-xl border border-gray-300 text-sm hover:border-gold-500">30 Hari</button>
+            <button onclick="changePeriod('90')"
+                class="px-4 py-2 rounded-xl border border-gray-300 text-sm hover:border-gold-500">90 Hari</button>
+        </div>
+
+        <!-- Ganti charts dengan semantic figures -->
+        <section aria-labelledby="analytics-heading">
+            <h2 id="analytics-heading" class="sr-only">Analitik & Laporan</h2>
+
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <article class="card p-6" aria-labelledby="revenue-trend-title">
+                    <h3 id="revenue-trend-title" class="font-semibold mb-4">Revenue Trend</h3>
+                    <figure>
+                        <canvas id="revenueTrendChart" height="250" role="img"
+                            aria-label="Grafik tren pendapatan"></canvas>
+                        <figcaption class="text-xs text-gray-400 mt-2">Pendapatan dalam periode terpilih</figcaption>
+                    </figure>
+                </article>
+
+                <article class="card p-6" aria-labelledby="orders-trend-title">
+                    <h3 id="orders-trend-title" class="font-semibold mb-4">Orders per Day</h3>
+                    <figure>
+                        <canvas id="ordersTrendChart" height="250" role="img"
+                            aria-label="Grafik pesanan harian"></canvas>
+                        <figcaption class="text-xs text-gray-400 mt-2">Jumlah pesanan per hari</figcaption>
+                    </figure>
+                </article>
+            </div>
+        </section>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-4 gap-6">
+            <div class="card p-6 text-center">
+                <div class="text-3xl font-bold text-gold-500" id="avgOrderValue">Rp 0</div>
+                <div class="text-sm text-gray-500 mt-2">Rata-rata Nilai Pesanan</div>
+            </div>
+            <div class="card p-6 text-center">
+                <div class="text-3xl font-bold text-gold-500" id="totalCustomers">0</div>
+                <div class="text-sm text-gray-500 mt-2">Total Pelanggan</div>
+            </div>
+            <div class="card p-6 text-center">
+                <div class="text-3xl font-bold text-gold-500" id="conversionRate">0%</div>
+                <div class="text-sm text-gray-500 mt-2">Konversi Pesanan</div>
+            </div>
+            <div class="card p-6 text-center">
+                <div class="text-3xl font-bold text-gold-500" id="bestDay">-</div>
+                <div class="text-sm text-gray-500 mt-2">Hari Terbaik</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+        let currentPeriod = 7;
+        let charts = {};
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+        }
+        checkAuth();
+
+        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+
+        function changePeriod(days) {
+            currentPeriod = days;
+            document.querySelectorAll('.card button').forEach(b => b.classList.remove('bg-gold-500', 'text-white'));
+            event.target.classList.add('bg-gold-500', 'text-white');
+            loadAnalytics();
+        }
+
+        function destroyCharts() {
+            Object.values(charts).forEach(c => c.destroy());
+            charts = {};
+        }
+
+        async function loadAnalytics() {
+            const since = new Date();
+            since.setDate(since.getDate() - currentPeriod);
+
+            // Get orders within period
+            const { data: orders } = await supabase
+                .from('orders')
+                .select('*, order_items(*)')
+                .gte('created_at', since.toISOString())
+                .order('created_at', { ascending: true });
+
+            // Destroy existing charts
+            destroyCharts();
+
+            // Revenue Trend
+            const dailyData = {};
+            orders?.forEach(o => {
+                const day = new Date(o.created_at).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' });
+                dailyData[day] = (dailyData[day] || 0) + (o.total_price || 0);
+            });
+
+            const labels = Object.keys(dailyData);
+            const revenueData = Object.values(dailyData);
+
+            charts.revenue = new Chart(document.getElementById('revenueTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenueData,
+                        borderColor: '#D4AF37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // Orders per Day
+            const orderCounts = {};
+            orders?.forEach(o => {
+                const day = new Date(o.created_at).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' });
+                orderCounts[day] = (orderCounts[day] || 0) + 1;
+            });
+
+            charts.orders = new Chart(document.getElementById('ordersTrendChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pesanan',
+                        data: labels.map(l => orderCounts[l] || 0),
+                        backgroundColor: '#D4AF37',
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // Top Products
+            const productSales = {};
+            orders?.forEach(o => {
+                o.order_items?.forEach(i => {
+                    productSales[i.product_name] = (productSales[i.product_name] || 0) + (i.quantity || 1);
+                });
+            });
+            const topProducts = Object.entries(productSales).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            charts.products = new Chart(document.getElementById('topProductsChart'), {
+                type: 'bar',
+                data: {
+                    labels: topProducts.map(p => p[0].substring(0, 20)),
+                    datasets: [{
+                        label: 'Terjual',
+                        data: topProducts.map(p => p[1]),
+                        backgroundColor: ['#D4AF37', '#B8960C', '#F4E4C1', '#E5C100', '#C9A800']
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // Status Distribution
+            const statusCounts = {};
+            orders?.forEach(o => { statusCounts[o.status] = (statusCounts[o.status] || 0) + 1; });
+
+            charts.status = new Chart(document.getElementById('statusPieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Paid', 'Processing', 'Completed'],
+                    datasets: [{
+                        data: [statusCounts.pending || 0, statusCounts.paid || 0, statusCounts.processing || 0, statusCounts.completed || 0],
+                        backgroundColor: ['#FBBF24', '#3B82F6', '#8B5CF6', '#10B981']
+                    }]
+                }
+            });
+
+            // Category Sales
+            const { data: products } = await supabase.from('products').select('*, categories(name)');
+            const catSales = {};
+            products?.forEach(p => {
+                const cat = p.categories?.name || 'Lainnya';
+                catSales[cat] = (catSales[cat] || 0) + 1;
+            });
+
+            charts.category = new Chart(document.getElementById('categoryChart'), {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(catSales),
+                    datasets: [{
+                        data: Object.values(catSales),
+                        backgroundColor: ['#D4AF37', '#B8960C', '#F4E4C1', '#E5C100', '#C9A800']
+                    }]
+                }
+            });
+
+            // Summary
+            const totalRevenue = revenueData.reduce((a, b) => a + b, 0);
+            const totalOrders = orders?.length || 0;
+            document.getElementById('avgOrderValue').textContent = 'Rp ' + (totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0).toLocaleString('id-ID');
+
+            const { count: custCount } = await supabase.from('profiles').select('*', { count: 'exact' }).eq('role', 'customer');
+            document.getElementById('totalCustomers').textContent = custCount || 0;
+
+            document.getElementById('conversionRate').textContent = (custCount > 0 ? Math.round((totalOrders / custCount) * 100) : 0) + '%';
+            document.getElementById('bestDay').textContent = labels[revenueData.indexOf(Math.max(...revenueData))] || '-';
+        }
+
+        loadAnalytics();
+    </script>
+</body>
+
+</html>

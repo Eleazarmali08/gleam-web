@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id" itemscope itemtype="https://schema.org/WebApplication">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Login Gleam - Panel administrasi toko emas & perhiasan">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Gleam Admin Panel",
+        "description": "Panel administrasi untuk mengelola toko emas Gleam",
+        "url": "https://gleam.id/admin",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web"
+    }
+    </script>
+
+    <title>Admin Login - Gleam Jewelry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <!-- Main content with semantic tags -->
+    <main role="main" itemscope itemtype="https://schema.org/SiteNavigationElement">
+
+        <!-- Login Form with ARIA -->
+        <section class="glass rounded-2xl p-8 w-full max-w-md fade-in" aria-labelledby="login-heading" role="form"
+            aria-label="Form login admin">
+
+            <!-- Logo & Title -->
+            <header class="text-center mb-8">
+                <h1 id="login-heading" class="text-3xl font-bold text-gold-500" itemprop="name">
+                    GLEAM
+                </h1>
+                <p class="text-gray-400 mt-2" itemprop="description">Admin Panel</p>
+            </header>
+
+            <!-- Form -->
+            <form id="loginForm" class="space-y-4" novalidate>
+                <fieldset>
+                    <legend class="sr-only">Informasi Login</legend>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-300 mb-2">
+                            <span class="sr-only">Alamat</span> Email
+                        </label>
+                        <input type="email" id="email" name="email" required autocomplete="email" aria-required="true"
+                            aria-label="Alamat email" placeholder="admin@gleam.id"
+                            class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-300 mb-2">
+                            <span class="sr-only">Kata sandi</span> Password
+                        </label>
+                        <input type="password" id="password" name="password" required autocomplete="current-password"
+                            aria-required="true" aria-label="Kata sandi" placeholder="••••••••" minlength="6"
+                            class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition">
+                    </div>
+                </fieldset>
+
+                <!-- Submit -->
+                <button type="submit" aria-label="Masuk ke panel admin"
+                    class="w-full bg-gold-500 text-white py-3 rounded-xl font-semibold hover:bg-gold-600 transition focus:outline-none focus:ring-2 focus:ring-gold-500/50">
+                    Masuk
+                </button>
+            </form>
+
+            <!-- Error Message -->
+            <div id="error" class="text-red-500 text-center mt-4 hidden" role="alert" aria-live="polite"
+                aria-atomic="true">
+            </div>
+
+            <!-- Back to Home -->
+            <nav class="text-center mt-6" aria-label="Navigasi">
+                <a href="/" class="text-gray-400 hover:text-gold-500 transition text-sm"
+                    aria-label="Kembali ke halaman utama">
+                    ← Kembali ke Beranda
+                </a>
+            </nav>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="fixed bottom-4 text-center text-gray-600 text-xs" role="contentinfo">
+        <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('error');
+            errorEl.classList.add('hidden');
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+
+            if (error) {
+                errorEl.textContent = 'Login gagal: ' + error.message;
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', data.user.id)
+                .single();
+
+            if (profile?.role === 'admin') {
+                window.location.href = 'dashboard.html';
+            } else {
+                await supabase.auth.signOut();
+                errorEl.textContent = 'Akses ditolak. Bukan admin.';
+                errorEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

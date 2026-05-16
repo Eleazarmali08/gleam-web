@@ -1,0 +1,43 @@
+
+## ⚙️ Setup
+
+1. Upload semua file ke hosting PHP
+2. Ganti `YOUR_ANON_KEY` dan `YOUR_SERVICE_ROLE_KEY` di:
+   - `api/config.php`
+   - `admin/login.html`
+   - `admin/dashboard.html`
+3. Setting `.htaccess` untuk rewrite rules
+4. Buka `https://domain-anda.com`
+
+## 🔐 Default Admin
+
+Buat admin pertama via Supabase Dashboard:
+1. Authentication → Users → Add User
+2. Table Editor → profiles → Edit role menjadi `admin`
+
+## 📊 Fitur
+
+- ✅ Dashboard dengan statistik & charts
+- ✅ CRUD produk dengan upload gambar
+- ✅ Manajemen pesanan (filter, update status)
+- ✅ Data pelanggan & riwayat belanja
+- ✅ Analitik penjualan
+- ✅ Pengaturan toko & rekening bank
+- ✅ Responsive design (desktop & tablet)
+- ✅ White Gold theme
+
+## 🎨 Theme
+
+- Primary: #D4AF37 (Gold)
+- Secondary: #B8960C (Dark Gold)
+- Background: #F8F9FA (Light) / #1A1A1A (Dark sidebar)
+- Font: Inter, system-ui
+
+## 📱 Demo
+
+- Landing: https://gleam.id
+- Admin: https://gleam.id/admin/login.html
+
+## 📄 License
+
+MIT License - Project Kuliah

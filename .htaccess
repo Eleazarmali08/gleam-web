@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# API Routes
+RewriteRule ^api/products/?$ api/products.php [L,QSA]
+RewriteRule ^api/products/([0-9a-f-]+)/?$ api/products.php?id=$1 [L,QSA]
+RewriteRule ^api/orders/?$ api/orders.php [L,QSA]
+RewriteRule ^api/orders/([0-9a-f-]+)/?$ api/orders.php?id=$1 [L,QSA]
+RewriteRule ^api/dashboard/?$ api/dashboard.php [L,QSA]
+RewriteRule ^api/upload/?$ api/upload.php [L,QSA]
+
+# Admin Routes
+RewriteRule ^admin/?$ admin/dashboard.html [L]

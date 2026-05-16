@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id" itemscope itemtype="https://schema.org/WebApplication">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Gleam - Platform Penjualan Emas & Perhiasan Premium. Temukan koleksi perhiasan terbaik dengan harga emas terkini.">
+    <meta name="keywords" content="emas, perhiasan, cincin, kalung, gelang, anting, gold, jewelry, gleam">
+    <meta name="author" content="Gleam Jewelry">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gleam - Luxury Gold & Jewelry">
+    <meta property="og:description" content="Platform Penjualan Emas & Perhiasan Premium">
+    <meta property="og:type" content="website">
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Gleam",
+        "description": "Platform Penjualan Emas & Perhiasan Premium",
+        "url": "https://gleam.id",
+        "applicationCategory": "Shopping",
+        "operatingSystem": "Web, Android, iOS"
+    }
+    </script>
+
+    <title>Gleam - Luxury Gold & Jewelry | Platform Penjualan Emas Premium</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#FEF9E7',
+                            100: '#FEF3C7',
+                            200: '#FDE68A',
+                            300: '#FCD34D',
+                            400: '#FBBF24',
+                            500: '#D4AF37',
+                            600: '#B8960C',
+                            700: '#A67C00',
+                            800: '#8B6500',
+                            900: '#704D00',
+                        },
+                        luxury: {
+                            dark: '#1A1A1A',
+                            surface: '#2D2D2D',
+                            light: '#F8F9FA',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #1A1A1A 100%);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+        }
+
+        .gold-text-gradient {
+            background: linear-gradient(135deg, #D4AF37, #F4E4C1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-luxury-dark text-white font-sans">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="text-2xl font-display font-bold gold-text-gradient" aria-label="Gleam Home">
+                GLEAM
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#products" class="text-gray-300 hover:text-gold-500 transition">Produk</a>
+                <a href="#about" class="text-gray-300 hover:text-gold-500 transition">Tentang</a>
+                <a href="#contact" class="text-gray-300 hover:text-gold-500 transition">Kontak</a>
+                <a href="/admin/login.html"
+                    class="bg-gold-500 text-white px-6 py-2 rounded-full hover:bg-gold-600 transition font-medium">
+                    Admin Panel
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient min-h-screen flex items-center pt-20" aria-labelledby="hero-heading">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            <div class="fade-in">
+                <span class="text-gold-500 font-semibold tracking-wider uppercase">Luxury Jewelry Collection</span>
+                <h1 id="hero-heading" class="text-5xl md:text-6xl font-display font-bold mt-4 leading-tight">
+                    Bersinar dengan<br>
+                    <span class="gold-text-gradient">Kemewahan Terbaik</span>
+                </h1>
+                <p class="text-gray-400 mt-6 text-lg leading-relaxed">
+                    Temukan koleksi perhiasan emas premium dengan desain elegan. Dari cincin berlian hingga kalung
+                    mutiara, setiap karya dibuat dengan ketelitian tinggi.
+                </p>
+                <div class="flex gap-4 mt-8">
+                    <a href="#products"
+                        class="gold-gradient text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition">
+                        Lihat Koleksi
+                    </a>
+                    <a href="#about"
+                        class="border border-gold-500 text-gold-500 px-8 py-4 rounded-full font-semibold hover:bg-gold-500 hover:text-white transition">
+                        Pelajari Lebih
+                    </a>
+                </div>
+            </div>
+            <div class="hidden md:block fade-in">
+                <div class="relative">
+                    <div class="w-80 h-80 bg-gold-500/20 rounded-full absolute -top-10 -right-10 blur-3xl"></div>
+                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600"
+                        alt="Cincin Emas Premium" class="relative z-10 rounded-2xl shadow-2xl" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 bg-luxury-dark" aria-labelledby="stats-heading">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 id="stats-heading" class="sr-only">Statistik Gleam</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="fade-in">
+                    <div class="text-4xl font-bold gold-text-gradient">500+</div>
+                    <div class="text-gray-400 mt-2">Produk</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-bold gold-text-gradient">10K+</div>
+                    <div class="text-gray-400 mt-2">Pelanggan</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-bold gold-text-gradient">24/7</div>
+                    <div class="text-gray-400 mt-2">Dukungan</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-bold gold-text-gradient">100%</div>
+                    <div class="text-gray-400 mt-2">Emas Asli</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 border-t border-white/10" role="contentinfo">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-2xl font-display gold-text-gradient mb-4">GLEAM</h3>
+                    <p class="text-gray-400">Platform penjualan emas & perhiasan premium terpercaya di Indonesia.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Tautan Cepat</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#products" class="hover:text-gold-500">Produk</a></li>
+                        <li><a href="#about" class="hover:text-gold-500">Tentang</a></li>
+                        <li><a href="/admin/login.html" class="hover:text-gold-500">Admin Panel</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Kontak</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>📧 info@gleam.id</li>
+                        <li>📱 +62 812-3456-7890</li>
+                        <li>📍 Jakarta, Indonesia</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/10 text-center text-gray-500">
+                <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
