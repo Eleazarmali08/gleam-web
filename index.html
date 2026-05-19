@@ -83,7 +83,7 @@
             z-index: -2;
         }
 
-        /* Pendaran Cahaya Emas di Balakng Konten */
+        /* Pendaran Cahaya Emas di Belakang Konten */
         .liquid-glow {
             position: fixed;
             width: 600px;
@@ -139,6 +139,41 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Kaca Kategori Aktif / Pasif */
+        .glass-btn-active {
+            background: linear-gradient(135deg, #E5C100, #B8960C);
+            color: #0D0D0D !important;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .glass-btn-inactive {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            color: #D1D5DB;
+        }
+
+        .glass-btn-inactive:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            color: #FBBF24;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Kartu Produk Kaca */
+        .glass-product-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-product-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
         }
 
         .fade-in {
@@ -243,6 +278,58 @@
         </div>
     </section>
 
+    <section id="products" class="py-20 relative" aria-labelledby="products-heading">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="text-center mb-12 fade-in">
+                <span class="text-gold-500 font-bold tracking-widest text-xs uppercase bg-gold-500/10 px-3 py-1.5 rounded-md border border-gold-500/20">Koleksi Kami</span>
+                <h2 id="products-heading" class="text-4xl font-display font-bold mt-4 text-white">
+                    Produk Unggulan
+                </h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto font-light text-sm leading-relaxed">
+                    Temukan berbagai koleksi perhiasan emas premium dengan desain elegan dan kualitas terbaik yang telah tersertifikasi global.
+                </p>
+            </div>
+
+            <div class="flex justify-center gap-3 mb-12 flex-wrap" id="categoryFilters">
+                <button onclick="filterProducts('all')" class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all tracking-wide glass-btn-active category-btn">
+                    Semua
+                </button>
+                <button onclick="filterProducts('cincin')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    💍 Cincin
+                </button>
+                <button onclick="filterProducts('kalung')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    📿 Kalung
+                </button>
+                <button onclick="filterProducts('gelang')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    ⌚ Gelang
+                </button>
+                <button onclick="filterProducts('anting')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    ✨ Anting
+                </button>
+            </div>
+
+            <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="col-span-2 md:col-span-4 text-center py-16 glass-effect rounded-2xl" id="productsLoading">
+                    <div class="inline-block w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-gray-400 text-sm mt-4 tracking-wide">Menghubungkan ke database produk...</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-12" id="loadMoreContainer" style="display:none;">
+                <button onclick="loadMoreProducts()" class="px-8 py-3.5 border border-gold-500/50 text-gold-400 rounded-full font-bold text-sm tracking-wide hover:bg-gold-500 hover:text-neutral-950 hover:border-gold-500 transition-all shadow-md">
+                    Lihat Lebih Banyak
+                </button>
+            </div>
+
+            <div class="text-center mt-12 border-t border-white/5 pt-6">
+                <a href="/admin/login.html" class="text-gray-600 hover:text-gold-500 transition-colors text-xs font-medium tracking-wider uppercase">
+                    🔐 Sistem Akses Kontrol Admin
+                </a>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-black/60 backdrop-blur-md py-12 border-t border-white/10" role="contentinfo">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid md:grid-cols-3 gap-8">
@@ -273,6 +360,6 @@
         </div>
     </footer>
 
-</body>
+    </body>
 
 </html>
