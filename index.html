@@ -193,6 +193,227 @@
             }
         }
     </style>
+    <!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // ============================================
+    // SUPABASE CONFIG
+    // ============================================
+    const SUPABASE_URL = 'https://ztrdiuvfczylzqsrrkhe.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← GANTI INI!
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // ============================================
+    // PRODUCT DATA
+    // ============================================
+    let allProducts = [];
+    let currentCategory = 'all';
+    let displayedCount = 4;
+    const LOAD_MORE_COUNT = 4;
+    
+    // ============================================
+    // LOAD PRODUCTS
+    // ============================================
+    async function loadProducts() {
+        try {
+            const { data: products, error } = await supabase
+                .from('products')
+                .select(`
+                    *,
+                    product_images(image_url, is_primary),
+                    categories!inner(slug, name)
+                `)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsLoading').innerHTML = 
+                    '<p class="text-red-400">⚠️ Gagal memuat produk</p>';
+                return;
+            }
+            
+            allProducts = products || [];
+            console.log('✅ Products loaded:', allProducts.length);
+            
+            // Tampilkan produk
+            displayProducts();
+            
+        } catch (err) {
+            console.error('Error:', err);
+            document.getElementById('productsLoading').innerHTML = 
+                '<p class="text-red-400">⚠️ Gagal memuat produk</p>';
+        }
+    }
+    
+    // ============================================
+    // DISPLAY PRODUCTS
+    // ============================================
+    function displayProducts() {
+        const grid = document.getElementById('productsGrid');
+        const loadingEl = document.getElementById('productsLoading');
+        const loadMoreBtn = document.getElementById('loadMoreContainer');
+        
+        // Filter by category
+        let filteredProducts = allProducts;
+        if (currentCategory !== 'all') {
+            filteredProducts = allProducts.filter(p => 
+                p.categories?.slug === currentCategory
+            );
+        }
+        
+        // Limit display
+        const displayProducts = filteredProducts.slice(0, displayedCount);
+        
+        // Hide loading
+        if (loadingEl) loadingEl.style.display = 'none';
+        
+        // Tampilkan produk
+        if (displayProducts.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-4 text-center py-12">
+                    <p class="text-gray-400 text-lg">😔 Tidak ada produk ditemukan</p>
+                    <p class="text-gray-500 text-sm mt-2">Coba kategori lain</p>
+                </div>
+            `;
+            loadMoreBtn.style.display = 'none';
+            return;
+        }
+        
+        grid.innerHTML = displayProducts.map(product => {
+            const primaryImage = product.product_images?.find(i => i.is_primary)?.image_url 
+                || product.product_images?.[0]?.image_url;
+            
+            return `
+                <div class="glass rounded-2xl overflow-hidden card-hover cursor-pointer fade-in" 
+                     onclick="openProductDetail('${product.id}')">
+                    <!-- Product Image -->
+                    <div class="relative h-48 bg-gray-800">
+                        ${primaryImage 
+                            ? `<img src="${primaryImage}" alt="${product.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/400x400/D4AF37/FFFFFF?text=No+Image'">`
+                            : `<div class="w-full h-full flex items-center justify-center">
+                                <span class="text-4xl">💎</span>
+                               </div>`
+                        }
+                        ${product.is_featured ? `
+                            <span class="absolute top-3 left-3 bg-gold-500 text-white text-xs px-2 py-1 rounded-full">
+                                Featured
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="p-4">
+                        <h3 class="font-semibold text-white text-sm mb-1 line-clamp-2">${product.name}</h3>
+                        <p class="text-gray-400 text-xs mb-2">${product.karat} • ${product.weight}g</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gold-500 font-bold text-sm">
+                                Rp ${product.price?.toLocaleString('id-ID')}
+                            </span>
+                            <span class="text-xs ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}">
+                                ${product.stock > 0 ? '✅ Stok' : '❌ Habis'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Show/hide load more
+        if (filteredProducts.length > displayedCount) {
+            loadMoreBtn.style.display = 'block';
+        } else {
+            loadMoreBtn.style.display = 'none';
+        }
+    }
+    
+    // ============================================
+    // FILTER PRODUCTS
+    // ============================================
+    function filterProducts(category) {
+        currentCategory = category;
+        displayedCount = LOAD_MORE_COUNT;
+        
+        // Update active button
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('bg-gold-500', 'text-white', 'border-gold-500');
+            btn.classList.add('border-gray-600', 'text-gray-300');
+        });
+        
+        const activeBtn = document.querySelector(`[onclick="filterProducts('${category}')"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('bg-gold-500', 'text-white');
+            activeBtn.classList.remove('border-gray-600', 'text-gray-300');
+        }
+        
+        displayProducts();
+        
+        // Scroll ke section products
+        document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // ============================================
+    // LOAD MORE
+    // ============================================
+    function loadMoreProducts() {
+        displayedCount += LOAD_MORE_COUNT;
+        displayProducts();
+    }
+    
+    // ============================================
+    // PRODUCT DETAIL (Simple Popup)
+    // ============================================
+    function openProductDetail(productId) {
+        const product = allProducts.find(p => p.id === productId);
+        if (!product) return;
+        
+        const primaryImage = product.product_images?.find(i => i.is_primary)?.image_url 
+            || product.product_images?.[0]?.image_url;
+        
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4';
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        
+        modal.innerHTML = `
+            <div class="bg-gray-900 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="relative">
+                    ${primaryImage 
+                        ? `<img src="${primaryImage}" alt="${product.name}" class="w-full h-64 object-cover rounded-t-2xl">`
+                        : `<div class="w-full h-64 bg-gray-800 flex items-center justify-center rounded-t-2xl"><span class="text-6xl">💎</span></div>`
+                    }
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full hover:bg-black/70">
+                        ✕
+                    </button>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-white mb-2">${product.name}</h3>
+                    <span class="inline-block bg-gold-500 text-white text-xs px-3 py-1 rounded-full mb-3">${product.karat}</span>
+                    <p class="text-gray-400 text-sm mb-4">${product.description || 'Tidak ada deskripsi'}</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                        <div><span class="text-gray-500">Berat:</span> <span class="text-white">${product.weight}g</span></div>
+                        <div><span class="text-gray-500">Stok:</span> <span class="${product.stock > 0 ? 'text-green-400' : 'text-red-400'}">${product.stock} tersedia</span></div>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-800 pt-4">
+                        <span class="text-2xl font-bold text-gold-500">Rp ${product.price?.toLocaleString('id-ID')}</span>
+                        <a href="/admin/login.html" class="bg-gold-500 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-gold-600 transition">
+                            Beli Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    // ============================================
+    // INIT
+    // ============================================
+    loadProducts();
+</script>
 </head>
 
 <body class="text-white font-sans antialiased">
