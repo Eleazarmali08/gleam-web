@@ -1,145 +1,351 @@
 <!DOCTYPE html>
 <html lang="id" itemscope itemtype="https://schema.org/WebApplication">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Admin Login Gleam - Panel administrasi toko emas & perhiasan">
     <meta name="robots" content="noindex, nofollow">
-
-    <!-- Schema.org -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Gleam Admin Panel",
-        "description": "Panel administrasi untuk mengelola toko emas Gleam",
-        "url": "https://gleam.id/admin",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web"
-    }
-    </script>
-
+    
     <title>Admin Login - Gleam Jewelry</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B8960C' },
+                        luxury: { dark: '#1A1A1A' }
+                    }
+                }
+            }
         }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            min-height: 100vh;
+        }
+        
+        .glass { 
+            background: rgba(255,255,255,0.05); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #D4AF37 !important;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+        
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #E5C100, #C9A800);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .btn-gold:active {
+            transform: translateY(0);
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-
-<body class="min-h-screen flex items-center justify-center p-6">
-
-    <!-- Main content with semantic tags -->
-    <main role="main" itemscope itemtype="https://schema.org/SiteNavigationElement">
-
-        <!-- Login Form with ARIA -->
-        <section class="glass rounded-2xl p-8 w-full max-w-md fade-in" aria-labelledby="login-heading" role="form"
-            aria-label="Form login admin">
-
+<body class="flex items-center justify-center p-6">
+    
+    <main role="main" class="w-full max-w-md">
+        
+        <section class="glass p-8 fade-in" aria-labelledby="login-heading" role="form" aria-label="Form login admin">
+            
             <!-- Logo & Title -->
             <header class="text-center mb-8">
-                <h1 id="login-heading" class="text-3xl font-bold text-gold-500" itemprop="name">
+                <div class="text-5xl mb-4">💎</div>
+                <h1 id="login-heading" class="text-3xl font-bold text-gold-500">
                     GLEAM
                 </h1>
-                <p class="text-gray-400 mt-2" itemprop="description">Admin Panel</p>
+                <p class="text-gray-400 mt-2">Admin Panel</p>
             </header>
-
+            
             <!-- Form -->
-            <form id="loginForm" class="space-y-4" novalidate>
-                <fieldset>
-                    <legend class="sr-only">Informasi Login</legend>
-
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label for="email" class="block text-gray-300 mb-2">
-                            <span class="sr-only">Alamat</span> Email
-                        </label>
-                        <input type="email" id="email" name="email" required autocomplete="email" aria-required="true"
-                            aria-label="Alamat email" placeholder="admin@gleam.id"
-                            class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition">
-                    </div>
-
-                    <!-- Password -->
-                    <div class="mb-6">
-                        <label for="password" class="block text-gray-300 mb-2">
-                            <span class="sr-only">Kata sandi</span> Password
-                        </label>
-                        <input type="password" id="password" name="password" required autocomplete="current-password"
-                            aria-required="true" aria-label="Kata sandi" placeholder="••••••••" minlength="6"
-                            class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition">
-                    </div>
-                </fieldset>
-
-                <!-- Submit -->
-                <button type="submit" aria-label="Masuk ke panel admin"
-                    class="w-full bg-gold-500 text-white py-3 rounded-xl font-semibold hover:bg-gold-600 transition focus:outline-none focus:ring-2 focus:ring-gold-500/50">
-                    Masuk
+            <form id="loginForm" class="space-y-5" novalidate>
+                
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-gray-300 text-sm font-medium mb-2">
+                        Email
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        required 
+                        autocomplete="email"
+                        aria-required="true"
+                        aria-label="Alamat email"
+                        placeholder="admin@gleam.com"
+                        class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white placeholder-gray-500 transition">
+                </div>
+                
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-gray-300 text-sm font-medium mb-2">
+                        Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        required 
+                        autocomplete="current-password"
+                        aria-required="true"
+                        aria-label="Kata sandi"
+                        placeholder="••••••••"
+                        minlength="6"
+                        class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white placeholder-gray-500 transition">
+                </div>
+                
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    id="loginButton"
+                    aria-label="Masuk ke panel admin"
+                    class="btn-gold w-full text-white py-3.5 rounded-xl font-semibold text-lg focus:outline-none">
+                    <span id="buttonText">Masuk</span>
                 </button>
+                
+                <!-- Error Message -->
+                <div id="error" class="text-red-400 text-center text-sm hidden" role="alert" aria-live="polite" aria-atomic="true"></div>
+                
+                <!-- Success Message -->
+                <div id="success" class="text-green-400 text-center text-sm hidden" role="status" aria-live="polite"></div>
+                
             </form>
-
-            <!-- Error Message -->
-            <div id="error" class="text-red-500 text-center mt-4 hidden" role="alert" aria-live="polite"
-                aria-atomic="true">
-            </div>
-
+            
             <!-- Back to Home -->
             <nav class="text-center mt-6" aria-label="Navigasi">
-                <a href="/" class="text-gray-400 hover:text-gold-500 transition text-sm"
-                    aria-label="Kembali ke halaman utama">
+                <a href="/" class="text-gray-400 hover:text-gold-500 transition text-sm">
                     ← Kembali ke Beranda
                 </a>
             </nav>
         </section>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-6 text-gray-600 text-xs">
+            <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
+        </footer>
     </main>
 
-    <!-- Footer -->
-    <footer class="fixed bottom-4 text-center text-gray-600 text-xs" role="contentinfo">
-        <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
-    </footer>
-
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
-
+        // ============================================
+        // SUPABASE CONFIG - GANTI DENGAN ANON KEY ANDA!
+        // ============================================
+        const SUPABASE_URL = 'https://ztrdiuvfczylzqsrrkhe.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← GANTI INI!
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ============================================
+        // DEBUG MODE (bisa dimatikan untuk production)
+        // ============================================
+        const DEBUG = true;
+        function log(...args) {
+            if (DEBUG) console.log(...args);
+        }
+        
+        // ============================================
+        // LOGIN HANDLER
+        // ============================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
             const errorEl = document.getElementById('error');
+            const successEl = document.getElementById('success');
+            const buttonText = document.getElementById('buttonText');
+            const loginButton = document.getElementById('loginButton');
+            
+            // Reset messages
             errorEl.classList.add('hidden');
-
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            });
-
-            if (error) {
-                errorEl.textContent = 'Login gagal: ' + error.message;
+            successEl.classList.add('hidden');
+            
+            // Validasi
+            if (!email || !password) {
+                errorEl.textContent = '⚠️ Email dan password harus diisi!';
                 errorEl.classList.remove('hidden');
                 return;
             }
-
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', data.user.id)
-                .single();
-
-            if (profile?.role === 'admin') {
-                window.location.href = 'dashboard.html';
-            } else {
-                await supabase.auth.signOut();
-                errorEl.textContent = 'Akses ditolak. Bukan admin.';
+            
+            if (password.length < 6) {
+                errorEl.textContent = '⚠️ Password minimal 6 karakter!';
                 errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            // Loading state
+            loginButton.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Masuk...';
+            
+            log('🔐 Login attempt:', email);
+            
+            try {
+                // Step 1: Login ke Supabase
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (authError) {
+                    log('❌ Auth error:', authError);
+                    throw new Error(authError.message);
+                }
+                
+                if (!authData?.user) {
+                    throw new Error('User tidak ditemukan');
+                }
+                
+                log('✅ Login berhasil, user ID:', authData.user.id);
+                
+                // Step 2: Cek role admin
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role, full_name')
+                    .eq('id', authData.user.id)
+                    .single();
+                
+                if (profileError) {
+                    log('❌ Profile error:', profileError);
+                    
+                    // Mungkin profile belum ada, coba buat
+                    const { error: insertError } = await supabase
+                        .from('profiles')
+                        .insert({
+                            id: authData.user.id,
+                            full_name: authData.user.user_metadata?.full_name || 'Admin',
+                            email: email,
+                            role: 'customer' // Default customer
+                        });
+                    
+                    if (insertError) {
+                        log('❌ Insert profile error:', insertError);
+                        await supabase.auth.signOut();
+                        throw new Error('Profil tidak ditemukan. Hubungi administrator.');
+                    }
+                    
+                    // Coba lagi
+                    const { data: newProfile } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', authData.user.id)
+                        .single();
+                    
+                    if (!newProfile || newProfile.role !== 'admin') {
+                        await supabase.auth.signOut();
+                        throw new Error('Akun Anda bukan admin. Akses ditolak.');
+                    }
+                }
+                
+                log('👤 Profile:', profile);
+                
+                // Step 3: Verifikasi admin
+                if (!profile || profile.role !== 'admin') {
+                    await supabase.auth.signOut();
+                    throw new Error('Akses ditolak. Anda bukan admin. Hubungi administrator.');
+                }
+                
+                log('✅ Admin confirmed! Redirecting...');
+                
+                // Success
+                successEl.textContent = '✅ Login berhasil! Mengalihkan...';
+                successEl.classList.remove('hidden');
+                
+                // Redirect setelah delay singkat
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 800);
+                
+            } catch (err) {
+                log('❌ Error:', err.message);
+                errorEl.textContent = '❌ ' + err.message;
+                errorEl.classList.remove('hidden');
+                
+                // Reset button
+                loginButton.disabled = false;
+                buttonText.textContent = 'Masuk';
+            }
+        });
+        
+        // ============================================
+        // CEK APAKAH SUDAH LOGIN
+        // ============================================
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                log('🔍 Session found, checking role...');
+                
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (profile?.role === 'admin') {
+                    log('✅ Already logged in as admin, redirecting...');
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        }
+        
+        // Cek session saat halaman load
+        checkSession();
+        
+        // ============================================
+        // ENTER KEY TO SUBMIT
+        // ============================================
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && document.activeElement?.tagName === 'INPUT') {
+                document.getElementById('loginForm').requestSubmit();
             }
         });
     </script>
 </body>
-
 </html>
