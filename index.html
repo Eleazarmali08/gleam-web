@@ -9,12 +9,10 @@
     <meta name="keywords" content="emas, perhiasan, cincin, kalung, gelang, anting, gold, jewelry, gleam">
     <meta name="author" content="Gleam Jewelry">
 
-    <!-- Open Graph -->
     <meta property="og:title" content="Gleam - Luxury Gold & Jewelry">
     <meta property="og:description" content="Platform Penjualan Emas & Perhiasan Premium">
     <meta property="og:type" content="website">
 
-    <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -29,7 +27,6 @@
 
     <title>Gleam - Luxury Gold & Jewelry | Platform Penjualan Emas Premium</title>
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -49,9 +46,8 @@
                             900: '#704D00',
                         },
                         luxury: {
-                            dark: '#1A1A1A',
-                            surface: '#2D2D2D',
-                            light: '#F8F9FA',
+                            dark: '#0D0D0D',
+                            surface: 'rgba(255, 255, 255, 0.03)',
                         }
                     },
                     fontFamily: {
@@ -63,164 +59,536 @@
         }
     </script>
 
-    <!-- Custom Styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
-        .hero-gradient {
-            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #1A1A1A 100%);
+        body {
+            position: relative;
+            background-color: #0D0D0D;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Liquid Glass Layout Global */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(180deg, rgba(13, 13, 13, 0.75) 0%, rgba(13, 13, 13, 0.95) 100%), url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200');
+            background-size: cover;
+            background-position: center;
+            filter: contrast(105%) brightness(90%);
+            z-index: -2;
+        }
+
+        /* Pendaran Cahaya Emas di Belakang Konten */
+        .liquid-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(0,0,0,0) 70%);
+            top: 30%;
+            right: -10%;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .gold-gradient {
-            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            background: linear-gradient(135deg, #E5C100, #B8960C);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gold-gradient:hover {
+            background: linear-gradient(135deg, #FBBF24, #D4AF37);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
         }
 
         .gold-text-gradient {
-            background: linear-gradient(135deg, #D4AF37, #F4E4C1);
+            background: linear-gradient(135deg, #FFF1C5 0%, #D4AF37 50%, #A67C00 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
+        /* Advanced Glassmorphism Effect */
         .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px) saturate(160%);
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
         }
 
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        /* Efek Kaca Khusus untuk Navigasi Atas */
+        .glass-nav {
+            background: rgba(13, 13, 13, 0.4);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Bingkai Foto Berwarna Kaca Cair */
+        .glass-img-frame {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Kaca Kategori Aktif / Pasif */
+        .glass-btn-active {
+            background: linear-gradient(135deg, #E5C100, #B8960C);
+            color: #0D0D0D !important;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .glass-btn-inactive {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            color: #D1D5DB;
+        }
+
+        .glass-btn-inactive:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            color: #FBBF24;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Kartu Produk Kaca */
+        .glass-product-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-product-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
         }
 
         .fade-in {
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
+                filter: blur(5px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
+                filter: blur(0);
             }
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIG
+        // ============================================
+        const SUPABASE_URL = 'https://ztrdiuvfczylzqsrrkhe.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← GANTI INI!
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ============================================
+        // PRODUCT DATA
+        // ============================================
+        let allProducts = [];
+        let currentCategory = 'all';
+        let displayedCount = 4;
+        const LOAD_MORE_COUNT = 4;
+        
+        // ============================================
+        // LOAD PRODUCTS
+        // ============================================
+        async function loadProducts() {
+            try {
+                const { data: products, error } = await supabase
+                    .from('products')
+                    .select(`
+                        *,
+                        product_images(image_url, is_primary),
+                        categories!inner(slug, name)
+                    `)
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading products:', error);
+                    document.getElementById('productsLoading').innerHTML = 
+                        '<p class="text-red-400">⚠️ Gagal memuat produk</p>';
+                    return;
+                }
+                
+                allProducts = products || [];
+                console.log('✅ Products loaded:', allProducts.length);
+                
+                // Tampilkan produk
+                displayProducts();
+                
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('productsLoading').innerHTML = 
+                    '<p class="text-red-400">⚠️ Gagal memuat produk</p>';
+            }
+        }
+        
+        // ============================================
+        // DISPLAY PRODUCTS
+        // ============================================
+        function displayProducts() {
+            const grid = document.getElementById('productsGrid');
+            const loadingEl = document.getElementById('productsLoading');
+            const loadMoreBtn = document.getElementById('loadMoreContainer');
+            
+            // Filter berdasarkan kategori
+            let filteredProducts = allProducts;
+            if (currentCategory !== 'all') {
+                filteredProducts = allProducts.filter(p => 
+                    p.categories?.slug === currentCategory
+                );
+            }
+            
+            // Batasi jumlah yang tampil
+            const displayProducts = filteredProducts.slice(0, displayedCount);
+            
+            // Sembunyikan loading spinner
+            if (loadingEl) loadingEl.style.display = 'none';
+            
+            // Render jika data kosong
+            if (displayProducts.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 md:col-span-4 text-center py-16 glass-effect rounded-2xl">
+                        <p class="text-gray-400 text-lg">😔 Tidak ada produk ditemukan</p>
+                        <p class="text-gray-500 text-sm mt-2">Coba pilih kategori yang lain</p>
+                    </div>
+                `;
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+            
+            // Render isi grid produk dengan Class Glassmorphism yang benar
+            grid.innerHTML = displayProducts.map(product => {
+                const primaryImage = product.product_images?.find(i => i.is_primary)?.image_url 
+                    || product.product_images?.[0]?.image_url;
+                
+                return `
+                    <div class="glass-product-card rounded-2xl overflow-hidden cursor-pointer fade-in flex flex-col justify-between" 
+                         onclick="openProductDetail('${product.id}')">
+                        <div class="relative h-48 bg-white/5 overflow-hidden">
+                            ${primaryImage 
+                                ? `<img src="${primaryImage}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/400x400/1a1a1a/D4AF37?text=Gleam+Jewelry'">`
+                                : `<div class="w-full h-full flex items-center justify-center bg-neutral-900/40">
+                                    <span class="text-4xl">💎</span>
+                                   </div>`
+                            }
+                            ${product.is_featured ? `
+                                <span class="absolute top-3 left-3 bg-gold-500 text-neutral-950 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                    Featured
+                                </span>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div class="mb-3">
+                                <h3 class="font-semibold text-gray-100 text-sm mb-1 line-clamp-2 hover:text-gold-400 transition-colors">${product.name}</h3>
+                                <p class="text-gray-400 text-xs">${product.karat || '24K'} • ${product.weight || '0'}g</p>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-white/5 pt-2">
+                                <span class="text-gold-400 font-bold text-sm">
+                                    Rp ${(product.price || 0).toLocaleString('id-ID')}
+                                </span>
+                                <span class="text-[11px] font-medium ${product.stock > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                    ${product.stock > 0 ? '● Tersedia' : '○ Habis'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Pengaturan visibilitas tombol load more
+            if (filteredProducts.length > displayedCount) {
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+        
+        // ============================================
+        // FILTER PRODUCTS (Diperbaiki Class Swap-nya)
+        // ============================================
+        function filterProducts(category) {
+            currentCategory = category;
+            displayedCount = LOAD_MORE_COUNT;
+            
+            // Kembalikan semua tombol ke status pasif (glass-btn-inactive)
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('glass-btn-active');
+                btn.classList.add('glass-btn-inactive');
+            });
+            
+            // Set tombol yang diklik menjadi status aktif (glass-btn-active)
+            const activeBtn = document.querySelector(`[onclick="filterProducts('${category}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('glass-btn-inactive');
+                activeBtn.classList.add('glass-btn-active');
+            }
+            
+            displayProducts();
+            
+            // Scroll halus ke area katalog produk
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ============================================
+        // LOAD MORE
+        // ============================================
+        function loadMoreProducts() {
+            displayedCount += LOAD_MORE_COUNT;
+            displayProducts();
+        }
+        
+        // ============================================
+        // PRODUCT DETAIL (Enhanced Modal Glassmorphism)
+        // ============================================
+        function openProductDetail(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            
+            const primaryImage = product.product_images?.find(i => i.is_primary)?.image_url 
+                || product.product_images?.[0]?.image_url;
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-all duration-300';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            
+            modal.innerHTML = `
+                <div class="glass-effect rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10" onclick="event.stopPropagation()">
+                    <div class="relative p-2">
+                        ${primaryImage 
+                            ? `<img src="${primaryImage}" alt="${product.name}" class="w-full h-72 object-cover rounded-2xl">`
+                            : `<div class="w-full h-72 bg-neutral-900 flex items-center justify-center rounded-2xl"><span class="text-6xl">💎</span></div>`
+                        }
+                        <button onclick="this.closest('.fixed').remove()" 
+                            class="absolute top-6 right-6 bg-black/60 text-white w-9 h-9 rounded-full hover:bg-gold-500 hover:text-neutral-950 transition-all flex items-center justify-center font-bold">
+                            ✕
+                        </button>
+                    </div>
+                    <div class="p-6 pt-4">
+                        <span class="inline-block bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-bold px-3 py-1 rounded-md mb-3">${product.karat || '24K'} Gold</span>
+                        <h3 class="text-2xl font-display font-bold text-white mb-2">${product.name}</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-6 font-light">${product.description || 'Tidak ada deskripsi detail untuk produk ini.'}</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6 p-4 bg-white/5 rounded-xl border border-white/5 text-sm">
+                            <div><span class="text-gray-400">Berat Estimasi:</span> <span class="text-gold-400 font-semibold">${product.weight || '0'}g</span></div>
+                            <div><span class="text-gray-400">Status Stok:</span> <span class="${product.stock > 0 ? 'text-emerald-400' : 'text-rose-400'} font-semibold">${product.stock || '0'} unit</span></div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between border-t border-white/10 pt-4 mt-2">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-400 uppercase tracking-wider">Harga Investasi</span>
+                                <span class="text-2xl font-extrabold text-gold-400">Rp ${(product.price || 0).toLocaleString('id-ID')}</span>
+                            </div>
+                            <a href="/admin/login.html" class="gold-gradient text-neutral-950 px-8 py-3.5 rounded-full text-sm font-bold tracking-wide shadow-md">
+                                Beli Sekarang
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // ============================================
+        // INIT
+        // ============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+        });
+    </script>
 </head>
 
-<body class="bg-luxury-dark text-white font-sans">
+<body class="text-white font-sans antialiased">
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-effect" role="navigation" aria-label="Main navigation">
+    <div class="liquid-bg"></div>
+    <div class="liquid-glow"></div>
+
+    <nav class="fixed top-0 w-full z-50 glass-nav" role="navigation" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="text-2xl font-display font-bold gold-text-gradient" aria-label="Gleam Home">
+            <a href="/" class="text-2xl font-display font-extrabold tracking-widest gold-text-gradient" aria-label="Gleam Home">
                 GLEAM
             </a>
             <div class="hidden md:flex items-center gap-8">
-                <a href="#products" class="text-gray-300 hover:text-gold-500 transition">Produk</a>
-                <a href="#about" class="text-gray-300 hover:text-gold-500 transition">Tentang</a>
-                <a href="#contact" class="text-gray-300 hover:text-gold-500 transition">Kontak</a>
+                <a href="#products" class="text-gray-300 hover:text-gold-400 transition-colors font-medium text-sm tracking-wide">Produk</a>
+                <a href="#about" class="text-gray-300 hover:text-gold-400 transition-colors font-medium text-sm tracking-wide">Tentang</a>
+                <a href="#contact" class="text-gray-300 hover:text-gold-400 transition-colors font-medium text-sm tracking-wide">Kontak</a>
                 <a href="/admin/login.html"
-                    class="bg-gold-500 text-white px-6 py-2 rounded-full hover:bg-gold-600 transition font-medium">
+                    class="bg-gradient-to-br from-white/10 to-white/0 border border-white/20 text-gold-400 px-6 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-semibold tracking-wide shadow-inner">
                     Admin Panel
                 </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient min-h-screen flex items-center pt-20" aria-labelledby="hero-heading">
+    <section class="min-h-screen flex items-center pt-24 pb-12" aria-labelledby="hero-heading">
         <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-            <div class="fade-in">
-                <span class="text-gold-500 font-semibold tracking-wider uppercase">Luxury Jewelry Collection</span>
-                <h1 id="hero-heading" class="text-5xl md:text-6xl font-display font-bold mt-4 leading-tight">
+            
+            <div class="fade-in glass-effect p-8 md:p-12 rounded-3xl">
+                <span class="text-gold-500 font-bold tracking-widest text-xs uppercase bg-gold-500/10 px-3 py-1.5 rounded-md border border-gold-500/20">
+                    Luxury Jewelry Collection
+                </span>
+                <h1 id="hero-heading" class="text-4xl md:text-5xl font-display font-bold mt-6 leading-tight">
                     Bersinar dengan<br>
-                    <span class="gold-text-gradient">Kemewahan Terbaik</span>
+                    <span class="gold-text-gradient font-extrabold">Kemewahan Terbaik</span>
                 </h1>
-                <p class="text-gray-400 mt-6 text-lg leading-relaxed">
+                <p class="text-gray-300/90 mt-6 text-base leading-relaxed font-light">
                     Temukan koleksi perhiasan emas premium dengan desain elegan. Dari cincin berlian hingga kalung
-                    mutiara, setiap karya dibuat dengan ketelitian tinggi.
+                    mutiara, setiap karya dibuat dengan ketelitian tingkat tinggi untuk melengkapi kilau prestise Anda.
                 </p>
-                <div class="flex gap-4 mt-8">
+                <div class="flex flex-wrap gap-4 mt-8">
                     <a href="#products"
-                        class="gold-gradient text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition">
+                        class="gold-gradient text-neutral-950 px-8 py-4 rounded-full font-bold text-sm tracking-wide shadow-md">
                         Lihat Koleksi
                     </a>
                     <a href="#about"
-                        class="border border-gold-500 text-gold-500 px-8 py-4 rounded-full font-semibold hover:bg-gold-500 hover:text-white transition">
+                        class="bg-white/5 border border-white/10 text-gray-200 px-8 py-4 rounded-full font-semibold text-sm tracking-wide hover:bg-white/10 hover:border-gold-500/50 transition-all">
                         Pelajari Lebih
                     </a>
                 </div>
             </div>
-            <div class="hidden md:block fade-in">
-                <div class="relative">
-                    <div class="w-80 h-80 bg-gold-500/20 rounded-full absolute -top-10 -right-10 blur-3xl"></div>
+
+            <div class="hidden md:block fade-in justify-self-center lg:justify-self-end">
+                <div class="relative p-4 glass-img-frame rounded-3xl">
                     <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600"
-                        alt="Cincin Emas Premium" class="relative z-10 rounded-2xl shadow-2xl" loading="lazy">
+                        alt="Cincin Emas Premium" class="relative z-10 rounded-2xl w-[400px] h-[400px] object-cover" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-20 rounded-2xl pointer-events-none"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="py-16 bg-luxury-dark" aria-labelledby="stats-heading">
+    <section class="py-12 my-6" aria-labelledby="stats-heading">
         <div class="max-w-7xl mx-auto px-6">
             <h2 id="stats-heading" class="sr-only">Statistik Gleam</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div class="fade-in">
-                    <div class="text-4xl font-bold gold-text-gradient">500+</div>
-                    <div class="text-gray-400 mt-2">Produk</div>
+            <div class="glass-effect rounded-2xl py-10 px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-extrabold gold-text-gradient">500+</div>
+                    <div class="text-gray-400 text-xs tracking-wider uppercase font-medium mt-2">Koleksi Produk</div>
                 </div>
-                <div class="fade-in">
-                    <div class="text-4xl font-bold gold-text-gradient">10K+</div>
-                    <div class="text-gray-400 mt-2">Pelanggan</div>
+                <div>
+                    <div class="text-4xl font-extrabold gold-text-gradient">10K+</div>
+                    <div class="text-gray-400 text-xs tracking-wider uppercase font-medium mt-2">Pelanggan Puas</div>
                 </div>
-                <div class="fade-in">
-                    <div class="text-4xl font-bold gold-text-gradient">24/7</div>
-                    <div class="text-gray-400 mt-2">Dukungan</div>
+                <div>
+                    <div class="text-4xl font-extrabold gold-text-gradient">24/7</div>
+                    <div class="text-gray-400 text-xs tracking-wider uppercase font-medium mt-2">Layanan Premium</div>
                 </div>
-                <div class="fade-in">
-                    <div class="text-4xl font-bold gold-text-gradient">100%</div>
-                    <div class="text-gray-400 mt-2">Emas Asli</div>
+                <div>
+                    <div class="text-4xl font-extrabold gold-text-gradient">100%</div>
+                    <div class="text-gray-400 text-xs tracking-wider uppercase font-medium mt-2">Sertifikasi Asli</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-black py-12 border-t border-white/10" role="contentinfo">
+    <section id="products" class="py-20 relative" aria-labelledby="products-heading">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="text-center mb-12 fade-in">
+                <span class="text-gold-500 font-bold tracking-widest text-xs uppercase bg-gold-500/10 px-3 py-1.5 rounded-md border border-gold-500/20">Koleksi Kami</span>
+                <h2 id="products-heading" class="text-4xl font-display font-bold mt-4 text-white">
+                    Produk Unggulan
+                </h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto font-light text-sm leading-relaxed">
+                    Temukan berbagai koleksi perhiasan emas premium dengan desain elegan dan kualitas terbaik yang telah tersertifikasi global.
+                </p>
+            </div>
+
+            <div class="flex justify-center gap-3 mb-12 flex-wrap" id="categoryFilters">
+                <button onclick="filterProducts('all')" class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all tracking-wide glass-btn-active category-btn">
+                    Semua
+                </button>
+                <button onclick="filterProducts('cincin')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    💍 Cincin
+                </button>
+                <button onclick="filterProducts('kalung')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    📿 Kalung
+                </button>
+                <button onclick="filterProducts('gelang')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    ⌚ Gelang
+                </button>
+                <button onclick="filterProducts('anting')" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all tracking-wide glass-btn-inactive category-btn">
+                    ✨ Anting
+                </button>
+            </div>
+
+            <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="col-span-2 md:col-span-4 text-center py-16 glass-effect rounded-2xl" id="productsLoading">
+                    <div class="inline-block w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-gray-400 text-sm mt-4 tracking-wide">Menghubungkan ke database produk...</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-12" id="loadMoreContainer" style="display:none;">
+                <button onclick="loadMoreProducts()" class="px-8 py-3.5 border border-gold-500/50 text-gold-400 rounded-full font-bold text-sm tracking-wide hover:bg-gold-500 hover:text-neutral-950 hover:border-gold-500 transition-all shadow-md">
+                    Lihat Lebih Banyak
+                </button>
+            </div>
+
+            <div class="text-center mt-12 border-t border-white/5 pt-6">
+                <a href="/admin/login.html" class="text-gray-600 hover:text-gold-500 transition-colors text-xs font-medium tracking-wider uppercase">
+                    🔐 Sistem Akses Kontrol Admin
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black/60 backdrop-blur-md py-12 border-t border-white/10" role="contentinfo">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid md:grid-cols-3 gap-8">
                 <div>
-                    <h3 class="text-2xl font-display gold-text-gradient mb-4">GLEAM</h3>
-                    <p class="text-gray-400">Platform penjualan emas & perhiasan premium terpercaya di Indonesia.</p>
+                    <h3 class="text-2xl font-display font-bold gold-text-gradient mb-4 tracking-widest">GLEAM</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Platform penjualan emas & perhiasan premium terpercaya di Indonesia. Menghadirkan kemewahan nyata langsung ke genggaman Anda.</p>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-4">Tautan Cepat</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#products" class="hover:text-gold-500">Produk</a></li>
-                        <li><a href="#about" class="hover:text-gold-500">Tentang</a></li>
-                        <li><a href="/admin/login.html" class="hover:text-gold-500">Admin Panel</a></li>
+                    <h4 class="font-semibold text-sm tracking-wider uppercase text-gold-400 mb-4">Tautan Cepat</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#products" class="hover:text-gold-400 transition-colors">Katalog Produk</a></li>
+                        <li><a href="#about" class="hover:text-gold-400 transition-colors">Tentang Kami</a></li>
+                        <li><a href="/admin/login.html" class="hover:text-gold-400 transition-colors">Admin Area</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-4">Kontak</h4>
-                    <ul class="space-y-2 text-gray-400">
+                    <h4 class="font-semibold text-sm tracking-wider uppercase text-gold-400 mb-4">Kontak Eksklusif</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
                         <li>📧 info@gleam.id</li>
                         <li>📱 +62 812-3456-7890</li>
                         <li>📍 Jakarta, Indonesia</li>
                     </ul>
                 </div>
             </div>
-            <div class="mt-8 pt-8 border-t border-white/10 text-center text-gray-500">
-                <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
+            <div class="mt-12 pt-8 border-t border-white/5 text-center text-gray-500 text-xs tracking-wide">
+                <p>&copy; 2026 Gleam Jewelry. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
 </body>
-
 </html>

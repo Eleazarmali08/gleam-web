@@ -8,7 +8,6 @@
     
     <title>Admin Login - Gleam Jewelry</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,7 +15,7 @@
                 extend: {
                     colors: {
                         gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B8960C' },
-                        luxury: { dark: '#1A1A1A' }
+                        luxury: { dark: '#0D0D0D' }
                     }
                 }
             }
@@ -29,46 +28,97 @@
         * { font-family: 'Inter', system-ui, sans-serif; }
         
         body { 
-            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            position: relative;
+            background-color: #0D0D0D;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Liquid Glass Layout */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(180deg, rgba(13, 13, 13, 0.6) 0%, #0D0D0D 100%), url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200');
+            background-size: cover;
+            background-position: center;
+            filter: contrast(110%) brightness(80%);
+            z-index: -2;
+        }
+
+        /* Ornamen Cahaya Cair Tambahan di Belakang Kartu */
+        .liquid-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
         }
         
+        /* Advanced Liquid Glassmorphism Card Style */
         .glass { 
-            background: rgba(255,255,255,0.05); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(25px) saturate(160%); 
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            /* Refleksi tepi kaca yang glossy */
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 24px;
+            /* Efek bayangan kaca berlapis */
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.15),
+                inset 0 -10px 20px rgba(255, 255, 255, 0.02);
+        }
+
+        /* Input Glassmorphism */
+        .glass-input {
+            background: rgba(0, 0, 0, 0.35) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-input:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-color: rgba(212, 175, 55, 0.6) !important;
+            box-shadow: 
+                0 0 0 3px rgba(212, 175, 55, 0.15),
+                inset 0 1px 2px rgba(212, 175, 55, 0.2);
         }
         
         .fade-in {
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #D4AF37 !important;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
         
         .btn-gold {
-            background: linear-gradient(135deg, #D4AF37, #B8960C);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #E5C100, #B8960C);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .btn-gold:hover {
-            background: linear-gradient(135deg, #E5C100, #C9A800);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #FBBF24, #D4AF37);
+            box-shadow: 0 12px 28px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
         }
         
         .btn-gold:active {
             transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
         }
         
         .spinner {
@@ -87,27 +137,29 @@
     </style>
 </head>
 <body class="flex items-center justify-center p-6">
+
+    <div class="liquid-bg"></div>
+    <div class="liquid-glow"></div>
     
-    <main role="main" class="w-full max-w-md">
+    <main role="main" class="w-full max-w-md z-10">
         
-        <section class="glass p-8 fade-in" aria-labelledby="login-heading" role="form" aria-label="Form login admin">
+        <section class="glass p-8 md:p-10 fade-in" aria-labelledby="login-heading" role="form" aria-label="Form login admin">
             
-            <!-- Logo & Title -->
             <header class="text-center mb-8">
-                <div class="text-5xl mb-4">💎</div>
-                <h1 id="login-heading" class="text-3xl font-bold text-gold-500">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-white/20 mb-4 shadow-inner">
+                    <span class="text-3xl">💎</span>
+                </div>
+                <h1 id="login-heading" class="text-3xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-gold-500 to-amber-600">
                     GLEAM
                 </h1>
-                <p class="text-gray-400 mt-2">Admin Panel</p>
+                <p class="text-gray-400/90 text-sm font-medium tracking-wider uppercase mt-1.5">Admin Panel</p>
             </header>
             
-            <!-- Form -->
-            <form id="loginForm" class="space-y-5" novalidate>
+            <form id="loginForm" class="space-y-6" novalidate>
                 
-                <!-- Email -->
                 <div>
-                    <label for="email" class="block text-gray-300 text-sm font-medium mb-2">
-                        Email
+                    <label for="email" class="block text-gray-300 text-sm font-medium mb-2 tracking-wide">
+                        Email Kantor
                     </label>
                     <input 
                         type="email" 
@@ -118,13 +170,12 @@
                         aria-required="true"
                         aria-label="Alamat email"
                         placeholder="admin@gleam.com"
-                        class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white placeholder-gray-500 transition">
+                        class="glass-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500/80 transition">
                 </div>
                 
-                <!-- Password -->
                 <div>
-                    <label for="password" class="block text-gray-300 text-sm font-medium mb-2">
-                        Password
+                    <label for="password" class="block text-gray-300 text-sm font-medium mb-2 tracking-wide">
+                        Kata Sandi
                     </label>
                     <input 
                         type="password" 
@@ -136,54 +187,48 @@
                         aria-label="Kata sandi"
                         placeholder="••••••••"
                         minlength="6"
-                        class="w-full px-4 py-3 bg-white/10 rounded-xl border border-white/20 text-white placeholder-gray-500 transition">
+                        class="glass-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500/80 transition">
                 </div>
                 
-                <!-- Submit Button -->
                 <button 
                     type="submit" 
                     id="loginButton"
                     aria-label="Masuk ke panel admin"
-                    class="btn-gold w-full text-white py-3.5 rounded-xl font-semibold text-lg focus:outline-none">
-                    <span id="buttonText">Masuk</span>
+                    class="btn-gold w-full text-neutral-950 py-3.5 rounded-xl font-bold text-base tracking-wide focus:outline-none mt-2">
+                    <span id="buttonText">Masuk Ke Sistem</span>
                 </button>
                 
-                <!-- Error Message -->
-                <div id="error" class="text-red-400 text-center text-sm hidden" role="alert" aria-live="polite" aria-atomic="true"></div>
+                <div id="error" class="text-red-400 text-center text-sm font-medium bg-red-500/10 border border-red-500/20 py-2.5 rounded-lg hidden" role="alert" aria-live="polite" aria-atomic="true"></div>
                 
-                <!-- Success Message -->
-                <div id="success" class="text-green-400 text-center text-sm hidden" role="status" aria-live="polite"></div>
+                <div id="success" class="text-green-400 text-center text-sm font-medium bg-green-500/10 border border-green-500/20 py-2.5 rounded-lg hidden" role="status" aria-live="polite"></div>
                 
             </form>
             
-            <!-- Back to Home -->
-            <nav class="text-center mt-6" aria-label="Navigasi">
-                <a href="/" class="text-gray-400 hover:text-gold-500 transition text-sm">
-                    ← Kembali ke Beranda
+            <nav class="text-center mt-8 border-t border-white/5 pt-4" aria-label="Navigasi">
+                <a href="/" class="text-gray-400 hover:text-gold-500 transition-colors text-sm font-medium inline-flex items-center gap-1">
+                    <span>←</span> Kembali ke Beranda
                 </a>
             </nav>
         </section>
         
-        <!-- Footer -->
-        <footer class="text-center mt-6 text-gray-600 text-xs">
-            <p>&copy; 2024 Gleam Jewelry. All rights reserved.</p>
+        <footer class="text-center mt-8 text-gray-500/70 text-xs tracking-wide">
+            <p>&copy; 2026 Gleam Jewelry. All rights reserved.</p>
         </footer>
     </main>
 
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
         // ============================================
-        // SUPABASE CONFIG - GANTI DENGAN ANON KEY ANDA!
+        // SUPABASE CONFIG - MENGGUNAKAN URL PROYEK ANDA
         // ============================================
         const SUPABASE_URL = 'https://ztrdiuvfczylzqsrrkhe.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← GANTI INI!
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← Tempel 'Publishable key' Supabase Anda di sini!
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // ============================================
-        // DEBUG MODE (bisa dimatikan untuk production)
+        // DEBUG MODE
         // ============================================
         const DEBUG = true;
         function log(...args) {
@@ -203,11 +248,9 @@
             const buttonText = document.getElementById('buttonText');
             const loginButton = document.getElementById('loginButton');
             
-            // Reset messages
             errorEl.classList.add('hidden');
             successEl.classList.add('hidden');
             
-            // Validasi
             if (!email || !password) {
                 errorEl.textContent = '⚠️ Email dan password harus diisi!';
                 errorEl.classList.remove('hidden');
@@ -220,14 +263,12 @@
                 return;
             }
             
-            // Loading state
             loginButton.disabled = true;
-            buttonText.innerHTML = '<span class="spinner"></span> Masuk...';
+            buttonText.innerHTML = '<span class="spinner"></span> Memvalidasi...';
             
             log('🔐 Login attempt:', email);
             
             try {
-                // Step 1: Login ke Supabase
                 const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
@@ -244,7 +285,6 @@
                 
                 log('✅ Login berhasil, user ID:', authData.user.id);
                 
-                // Step 2: Cek role admin
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('role, full_name')
@@ -254,14 +294,13 @@
                 if (profileError) {
                     log('❌ Profile error:', profileError);
                     
-                    // Mungkin profile belum ada, coba buat
                     const { error: insertError } = await supabase
                         .from('profiles')
                         .insert({
                             id: authData.user.id,
                             full_name: authData.user.user_metadata?.full_name || 'Admin',
                             email: email,
-                            role: 'customer' // Default customer
+                            role: 'customer'
                         });
                     
                     if (insertError) {
@@ -270,7 +309,6 @@
                         throw new Error('Profil tidak ditemukan. Hubungi administrator.');
                     }
                     
-                    // Coba lagi
                     const { data: newProfile } = await supabase
                         .from('profiles')
                         .select('role')
@@ -285,7 +323,6 @@
                 
                 log('👤 Profile:', profile);
                 
-                // Step 3: Verifikasi admin
                 if (!profile || profile.role !== 'admin') {
                     await supabase.auth.signOut();
                     throw new Error('Akses ditolak. Anda bukan admin. Hubungi administrator.');
@@ -293,11 +330,9 @@
                 
                 log('✅ Admin confirmed! Redirecting...');
                 
-                // Success
                 successEl.textContent = '✅ Login berhasil! Mengalihkan...';
                 successEl.classList.remove('hidden');
                 
-                // Redirect setelah delay singkat
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 800);
@@ -307,9 +342,8 @@
                 errorEl.textContent = '❌ ' + err.message;
                 errorEl.classList.remove('hidden');
                 
-                // Reset button
                 loginButton.disabled = false;
-                buttonText.textContent = 'Masuk';
+                buttonText.textContent = 'Masuk Ke Sistem';
             }
         });
         
@@ -335,7 +369,6 @@
             }
         }
         
-        // Cek session saat halaman load
         checkSession();
         
         // ============================================
