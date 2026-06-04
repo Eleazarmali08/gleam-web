@@ -229,20 +229,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
 
         // Auth Check
         async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) window.location.href = 'login.html';
         }
         checkAuth();
 
-        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+        function logout() { supabaseClient.auth.signOut(); window.location.href = 'login.html'; }
 
         // Load Categories
         async function loadCategories() {
-            const { data } = await supabase.from('categories').select('*').order('display_order');
+            const { data } = await supabaseClient.from('categories').select('*').order('display_order');
             const select = document.getElementById('productCategory');
             const filter = document.getElementById('categoryFilter');
             select.innerHTML = data?.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '';
@@ -255,7 +255,7 @@
             const category = document.getElementById('categoryFilter').value;
             const status = document.getElementById('statusFilter').value;
 
-            let query = supabase.from('products').select('*, categories(name), product_images(image_url, is_primary)').order('created_at', { ascending: false });
+            let query = supabaseClient.from('products').select('*, categories(name), product_images(image_url, is_primary)').order('created_at', { ascending: false });
 
             if (search) query = query.ilike('name', `%${search}%`);
             if (category) query = query.eq('category_id', category);
@@ -311,7 +311,7 @@
 
         // Edit Product
         async function editProduct(id) {
-            const { data: product } = await supabase.from('products').select('*, product_images(*)').eq('id', id).single();
+            const { data: product } = await supabaseClient.from('products').select('*, product_images(*)').eq('id', id).single();
             if (!product) return;
 
             document.getElementById('modalTitle').textContent = 'Edit Produk';
@@ -352,23 +352,23 @@
             };
 
             if (id) {
-                await supabase.from('products').update(data).eq('id', id);
+                await supabaseClient.from('products').update(data).eq('id', id);
             } else {
                 data.slug = data.name.toLowerCase().replace(/\s+/g, '-');
-                await supabase.from('products').insert(data);
+                await supabaseClient.from('products').insert(data);
             }
 
             // Upload image if selected
             const imageFile = document.getElementById('productImage').files[0];
             if (imageFile) {
                 const fileName = `${Date.now()}_${imageFile.name}`;
-                await supabase.storage.from('product-images').upload(fileName, imageFile);
-                const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                await supabaseClient.storage.from('product-images').upload(fileName, imageFile);
+                const { data: { publicUrl } } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
 
                 // Insert product image
-                const { data: newProduct } = await supabase.from('products').select('id').eq('slug', data.slug).single();
+                const { data: newProduct } = await supabaseClient.from('products').select('id').eq('slug', data.slug).single();
                 if (newProduct) {
-                    await supabase.from('product_images').insert({
+                    await supabaseClient.from('product_images').insert({
                         product_id: newProduct.id,
                         image_url: publicUrl,
                         is_primary: true
@@ -382,15 +382,15 @@
 
         // Toggle Status
         async function toggleStatus(id, currentStatus) {
-            await supabase.from('products').update({ is_active: !currentStatus }).eq('id', id);
+            await supabaseClient.from('products').update({ is_active: !currentStatus }).eq('id', id);
             loadProducts();
         }
 
         // Delete Product
         async function deleteProduct(id) {
             if (confirm('Yakin hapus produk ini?')) {
-                await supabase.from('product_images').delete().eq('product_id', id);
-                await supabase.from('products').delete().eq('id', id);
+                await supabaseClient.from('product_images').delete().eq('product_id', id);
+                await supabaseClient.from('products').delete().eq('id', id);
                 loadProducts();
             }
         }

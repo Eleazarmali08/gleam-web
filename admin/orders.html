@@ -171,16 +171,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
         let currentFilter = 'all';
 
         async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) window.location.href = 'login.html';
         }
         checkAuth();
 
-        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+        function logout() { supabaseClient.auth.signOut(); window.location.href = 'login.html'; }
 
         // Filter Tabs
         function filterOrders(status) {
@@ -197,7 +197,7 @@
 
         // Load Orders
         async function loadOrders() {
-            let query = supabase.from('orders').select('*, profiles(full_name, email)').order('created_at', { ascending: false });
+            let query = supabaseClient.from('orders').select('*, profiles(full_name, email)').order('created_at', { ascending: false });
 
             if (currentFilter !== 'all') {
                 query = query.eq('status', currentFilter);
@@ -236,7 +236,7 @@
 
             // Load item counts
             orders?.forEach(async (o) => {
-                const { count } = await supabase.from('order_items').select('*', { count: 'exact' }).eq('order_id', o.id);
+                const { count } = await supabaseClient.from('order_items').select('*', { count: 'exact' }).eq('order_id', o.id);
                 document.getElementById(`items-${o.id}`).textContent = `${count} item`;
             });
         }
@@ -248,13 +248,13 @@
             if (newStatus === 'paid') updates.paid_at = new Date().toISOString();
             if (newStatus === 'completed') updates.completed_at = new Date().toISOString();
 
-            await supabase.from('orders').update(updates).eq('id', orderId);
+            await supabaseClient.from('orders').update(updates).eq('id', orderId);
             loadOrders();
         }
 
         // View Order Detail
         async function viewOrderDetail(orderId) {
-            const { data: order } = await supabase.from('orders').select('*, profiles(*), order_items(*)').eq('id', orderId).single();
+            const { data: order } = await supabaseClient.from('orders').select('*, profiles(*), order_items(*)').eq('id', orderId).single();
             if (!order) return;
 
             const content = document.getElementById('orderDetailContent');

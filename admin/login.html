@@ -225,7 +225,7 @@
         const SUPABASE_URL = 'https://ztrdiuvfczylzqsrrkhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // ============================================
         // DEBUG MODE
@@ -269,7 +269,7 @@
             log('🔐 Login attempt:', email);
             
             try {
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
@@ -285,7 +285,7 @@
                 
                 log('✅ Login berhasil, user ID:', authData.user.id);
                 
-                const { data: profile, error: profileError } = await supabase
+                const { data: profile, error: profileError } = await supabaseClient
                     .from('profiles')
                     .select('role, full_name')
                     .eq('id', authData.user.id)
@@ -294,7 +294,7 @@
                 if (profileError) {
                     log('❌ Profile error:', profileError);
                     
-                    const { error: insertError } = await supabase
+                    const { error: insertError } = await supabaseClient
                         .from('profiles')
                         .insert({
                             id: authData.user.id,
@@ -305,18 +305,18 @@
                     
                     if (insertError) {
                         log('❌ Insert profile error:', insertError);
-                        await supabase.auth.signOut();
+                        await supabaseClient.auth.signOut();
                         throw new Error('Profil tidak ditemukan. Hubungi administrator.');
                     }
                     
-                    const { data: newProfile } = await supabase
+                    const { data: newProfile } = await supabaseClient
                         .from('profiles')
                         .select('role')
                         .eq('id', authData.user.id)
                         .single();
                     
                     if (!newProfile || newProfile.role !== 'admin') {
-                        await supabase.auth.signOut();
+                        await supabaseClient.auth.signOut();
                         throw new Error('Akun Anda bukan admin. Akses ditolak.');
                     }
                 }
@@ -324,7 +324,7 @@
                 log('👤 Profile:', profile);
                 
                 if (!profile || profile.role !== 'admin') {
-                    await supabase.auth.signOut();
+                    await supabaseClient.auth.signOut();
                     throw new Error('Akses ditolak. Anda bukan admin. Hubungi administrator.');
                 }
                 
@@ -351,12 +351,12 @@
         // CEK APAKAH SUDAH LOGIN
         // ============================================
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
                 log('🔍 Session found, checking role...');
                 
-                const { data: profile } = await supabase
+                const { data: profile } = await supabaseClient
                     .from('profiles')
                     .select('role')
                     .eq('id', session.user.id)

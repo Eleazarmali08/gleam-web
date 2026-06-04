@@ -322,7 +322,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Supabase Config
-        const supabase = window.supabase.createClient(
+        const supabaseClient = window.supabase.createClient(
             'https://ztrdiuvfczylzqsrrkhe.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw'
         );
@@ -333,7 +333,7 @@
 
         async function loadProducts() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('products')
                     .select('*, product_images(image_url, is_primary), categories(slug, name)')
                     .eq('is_active', true)

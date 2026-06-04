@@ -225,15 +225,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
 
         async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) window.location.href = 'login.html';
         }
         checkAuth();
 
-        function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+        function logout() { supabaseClient.auth.signOut(); window.location.href = 'login.html'; }
 
         // Tab Switching
         function switchTab(tab) {
@@ -247,7 +247,7 @@
 
         // Store Info
         async function loadStoreInfo() {
-            const { data } = await supabase.from('settings').select('*').eq('key', 'store_info').single();
+            const { data } = await supabaseClient.from('settings').select('*').eq('key', 'store_info').single();
             if (data?.value) {
                 const info = data.value;
                 document.getElementById('storeName').value = info.name || '';
@@ -265,18 +265,18 @@
                 phone: document.getElementById('storePhone').value,
                 address: document.getElementById('storeAddress').value
             };
-            const { data: existing } = await supabase.from('settings').select('*').eq('key', 'store_info').single();
+            const { data: existing } = await supabaseClient.from('settings').select('*').eq('key', 'store_info').single();
             if (existing) {
-                await supabase.from('settings').update({ value }).eq('key', 'store_info');
+                await supabaseClient.from('settings').update({ value }).eq('key', 'store_info');
             } else {
-                await supabase.from('settings').insert({ key: 'store_info', value });
+                await supabaseClient.from('settings').insert({ key: 'store_info', value });
             }
             alert('Informasi toko disimpan!');
         });
 
         // Bank Accounts
         async function loadBanks() {
-            const { data } = await supabase.from('payment_accounts').select('*').order('display_order');
+            const { data } = await supabaseClient.from('payment_accounts').select('*').order('display_order');
             document.getElementById('bankList').innerHTML = data?.map(b => `
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                     <div>
@@ -305,7 +305,7 @@
         }
 
         async function editBank(id) {
-            const { data } = await supabase.from('payment_accounts').select('*').eq('id', id).single();
+            const { data } = await supabaseClient.from('payment_accounts').select('*').eq('id', id).single();
             if (!data) return;
             document.getElementById('bankModalTitle').textContent = 'Edit Rekening';
             document.getElementById('bankId').value = data.id;
@@ -326,9 +326,9 @@
                 is_active: document.getElementById('bankActive').checked
             };
             if (id) {
-                await supabase.from('payment_accounts').update(data).eq('id', id);
+                await supabaseClient.from('payment_accounts').update(data).eq('id', id);
             } else {
-                await supabase.from('payment_accounts').insert(data);
+                await supabaseClient.from('payment_accounts').insert(data);
             }
             closeBankModal();
             loadBanks();
@@ -336,7 +336,7 @@
 
         async function deleteBank(id) {
             if (confirm('Hapus rekening ini?')) {
-                await supabase.from('payment_accounts').delete().eq('id', id);
+                await supabaseClient.from('payment_accounts').delete().eq('id', id);
                 loadBanks();
             }
         }
@@ -354,7 +354,7 @@
                 return;
             }
 
-            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
             if (error) {
                 msgEl.textContent = 'Gagal: ' + error.message;
                 msgEl.className = 'text-red-500 mt-4';

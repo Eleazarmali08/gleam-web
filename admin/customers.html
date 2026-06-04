@@ -104,7 +104,7 @@
                             <th scope="col" class="p-4">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="ordersTableBody">
+                    <tbody id="customersTableBody">
                         <tr>
                             <td colspan="7" class="p-8 text-center text-gray-400">Loading...</td>
                         </tr>
@@ -134,26 +134,26 @@
 
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         <script>
-            const supabase = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+            const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
 
             async function checkAuth() {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (!session) window.location.href = 'login.html';
             }
             checkAuth();
 
-            function logout() { supabase.auth.signOut(); window.location.href = 'login.html'; }
+            function logout() { supabaseClient.auth.signOut(); window.location.href = 'login.html'; }
 
             async function loadCustomers() {
                 const search = document.getElementById('searchCustomer').value;
-                let query = supabase.from('profiles').select('*').eq('role', 'customer').order('created_at', { ascending: false });
+                let query = supabaseClient.from('profiles').select('*').eq('role', 'customer').order('created_at', { ascending: false });
 
                 if (search) query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
 
                 const { data: customers } = await query;
 
                 const rows = await Promise.all(customers?.map(async (c) => {
-                    const { data: orders } = await supabase.from('orders').select('total_price').eq('user_id', c.id);
+                    const { data: orders } = await supabaseClient.from('orders').select('total_price').eq('user_id', c.id);
                     const totalOrders = orders?.length || 0;
                     const totalSpent = orders?.reduce((s, o) => s + (o.total_price || 0), 0) || 0;
 
@@ -186,8 +186,8 @@
             }
 
             async function viewCustomerDetail(customerId) {
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', customerId).single();
-                const { data: orders } = await supabase.from('orders').select('*').eq('user_id', customerId).order('created_at', { ascending: false });
+                const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', customerId).single();
+                const { data: orders } = await supabaseClient.from('orders').select('*').eq('user_id', customerId).order('created_at', { ascending: false });
 
                 document.getElementById('customerDetailContent').innerHTML = `
                 <div class="space-y-6">
