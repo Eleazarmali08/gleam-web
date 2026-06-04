@@ -1,348 +1,364 @@
 // ============================================
-// GLEAM THEME SERVICE
+// GLEAM THEME SERVICE - WHITE GOLD + DARK MODE
 // ============================================
 
 const GleamTheme = {
-    // Theme State
-    isDark: localStorage.getItem('gleam-theme') === 'dark' || true,
-    
+    // Default: White Gold (light)
+    isDark: localStorage.getItem('gleam-theme') === 'dark',
+
     // ============================================
     // COLORS
     // ============================================
     colors: {
         light: {
             bg: '#F8F9FA',
-            card: '#FFFFFF',
-            sidebar: 'rgba(255,255,255,0.75)',
+            card: 'rgba(255, 255, 255, 0.7)',
+            sidebar: 'rgba(255, 255, 255, 0.75)',
             text: '#1F1F1F',
             textSecondary: '#6B6B6B',
             gold: '#D4AF37',
             goldDark: '#B8960C',
-            goldLight: '#F4E4C1',
-            border: '#E5E7EB',
-            shadow: '0 1px 3px rgba(0,0,0,0.06)',
-            tableHover: 'rgba(0,0,0,0.02)',
+            border: 'rgba(0, 0, 0, 0.06)',
+            shadow: '0 4px 20px rgba(0,0,0,0.04)',
             inputBg: '#F8F9FA',
-            success: '#10B981',
-            warning: '#F59E0B',
-            danger: '#EF4444',
-            info: '#3B82F6',
+            hoverBg: 'rgba(212,175,55,0.06)',
         },
         dark: {
-            bg: '#1A1A1A',
-            card: '#252525',
-            sidebar: 'rgba(30,30,30,0.8)',
+            bg: '#0f1115',
+            card: 'rgba(255, 255, 255, 0.04)',
+            sidebar: 'rgba(26, 26, 26, 0.45)',
             text: '#F5F5F5',
-            textSecondary: '#B0B0B0',
+            textSecondary: 'rgba(255,255,255,0.5)',
             gold: '#D4AF37',
             goldDark: '#B8960C',
-            goldLight: '#F4E4C1',
-            border: '#333333',
-            shadow: '0 1px 3px rgba(0,0,0,0.3)',
-            tableHover: 'rgba(255,255,255,0.02)',
-            inputBg: '#1A1A1A',
-            success: '#34D399',
-            warning: '#FBBF24',
-            danger: '#F87171',
-            info: '#60A5FA',
+            border: 'rgba(255, 255, 255, 0.08)',
+            shadow: '0 8px 32px 0 rgba(0,0,0,0.2)',
+            inputBg: 'rgba(255,255,255,0.05)',
+            hoverBg: 'rgba(255,255,255,0.06)',
         }
     },
-    
-    // Get current colors
+
     get current() {
         return this.colors[this.isDark ? 'dark' : 'light'];
     },
-    
+
     // ============================================
-    // ICONS (iOS SF Symbols style)
+    // INIT
     // ============================================
-    icons: {
-        dashboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
-        products: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`,
-        orders: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-        customers: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-        analytics: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
-        settings: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
-        logout: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
-    },
-    
-    // ============================================
-    // CHART CONFIG
-    // ============================================
-    chartDefaults: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                labels: {
-                    color: '#6B6B6B',
-                    usePointStyle: true,
-                    padding: 16,
-                    font: { family: 'Inter, sans-serif', size: 12 }
-                }
-            }
-        },
-        scales: {
-            x: {
-                grid: { color: '#E5E7EB', drawBorder: false },
-                ticks: { color: '#6B6B6B', font: { size: 11 } }
-            },
-            y: {
-                grid: { color: '#E5E7EB', drawBorder: false },
-                ticks: { color: '#6B6B6B', font: { size: 11 } }
-            }
-        }
-    },
-    
-    chartColors: {
-        gold: '#D4AF37',
-        goldLight: 'rgba(212,175,55,0.1)',
-        blue: '#3B82F6',
-        purple: '#8B5CF6',
-        green: '#10B981',
-        orange: '#F59E0B',
-        red: '#EF4444',
-    },
-    
-    // ============================================
-    // METHODS
-    // ============================================
-    
-    // Initialize theme
     init() {
         this.applyTheme();
         this.setupToggle();
-        this.watchSystemTheme();
+        this.injectStyles();
     },
-    
-    // Apply theme to DOM
+
+    // ============================================
+    // APPLY THEME
+    // ============================================
     applyTheme() {
-        if (this.isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        
-        // Set CSS variables
         const c = this.current;
         const root = document.documentElement;
+
         root.style.setProperty('--bg', c.bg);
         root.style.setProperty('--card-bg', c.card);
         root.style.setProperty('--sidebar-bg', c.sidebar);
         root.style.setProperty('--text', c.text);
         root.style.setProperty('--text-secondary', c.textSecondary);
         root.style.setProperty('--gold', c.gold);
+        root.style.setProperty('--gold-dark', c.goldDark);
         root.style.setProperty('--border', c.border);
         root.style.setProperty('--shadow', c.shadow);
         root.style.setProperty('--input-bg', c.inputBg);
-        
+        root.style.setProperty('--hover-bg', c.hoverBg);
+
+        document.body.style.backgroundColor = c.bg;
+        document.body.style.color = c.text;
+
+        if (this.isDark) {
+            document.body.style.backgroundImage = `
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(244, 63, 94, 0.15) 0px, transparent 50%)
+            `;
+            document.body.style.backgroundAttachment = 'fixed';
+        } else {
+            document.body.style.backgroundImage = 'none';
+            document.body.style.backgroundAttachment = 'scroll';
+        }
+
         this.updateCharts();
     },
-    
-    // Toggle theme
+
+    // ============================================
+    // TOGGLE
+    // ============================================
     toggle() {
         this.isDark = !this.isDark;
         localStorage.setItem('gleam-theme', this.isDark ? 'dark' : 'light');
         this.applyTheme();
+        this.setupToggle();
     },
-    
-    // Setup toggle button
+
     setupToggle() {
         const toggle = document.getElementById('themeToggle');
-        if (!toggle) return;
-        
+        const thumb = document.getElementById('toggleThumb');
+        if (!toggle || !thumb) return;
+
         if (this.isDark) {
-            toggle.classList.add('active');
+            toggle.style.background = '#D4AF37';
+            thumb.style.right = '2px';
+            thumb.style.left = 'auto';
         } else {
-            toggle.classList.remove('active');
+            toggle.style.background = '#D1D5DB';
+            thumb.style.left = '2px';
+            thumb.style.right = 'auto';
         }
-        
+
         toggle.onclick = () => this.toggle();
     },
-    
-    // Watch system theme changes
-    watchSystemTheme() {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('gleam-theme')) {
-                this.isDark = e.matches;
-                this.applyTheme();
+
+    // ============================================
+    // INJECT GLOBAL STYLES
+    // ============================================
+    injectStyles() {
+        if (document.getElementById('gleam-theme-styles')) return;
+
+        const style = document.createElement('style');
+        style.id = 'gleam-theme-styles';
+        style.textContent = `
+            * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+
+            .glass-sidebar {
+                background: var(--sidebar-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-right: 1px solid var(--border);
             }
-        });
+
+            .glass-card {
+                background: var(--card-bg);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+                border-radius: 16px;
+            }
+
+            .glass-stat-card {
+                background: var(--card-bg);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid var(--border);
+                border-left: 4px solid var(--gold);
+                box-shadow: var(--shadow);
+                border-radius: 16px;
+                padding: 24px;
+            }
+
+            .glass-nav-active {
+                background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+                box-shadow: 0 4px 15px rgba(214, 175, 55, 0.3);
+                color: white !important;
+            }
+
+            .glass-nav-hover:hover {
+                background: var(--hover-bg);
+                border: 1px solid var(--border);
+            }
+
+            .btn-gold {
+                background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+                color: white;
+                box-shadow: 0 4px 15px rgba(214, 175, 55, 0.25);
+                transition: all 0.3s ease;
+            }
+
+            .btn-gold:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(214, 175, 55, 0.4);
+            }
+
+            input, select, textarea {
+                background: var(--input-bg);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 12px;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            }
+
+            table th {
+                color: var(--text-secondary) !important;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-size: 11px;
+            }
+
+            table td {
+                color: var(--text);
+                border-bottom: 1px solid var(--border);
+            }
+
+            table tr:hover td {
+                background: var(--hover-bg);
+            }
+        `;
+        document.head.appendChild(style);
     },
-    
-    // Update charts when theme changes
+
+    // ============================================
+    // CHART HELPERS
+    // ============================================
     updateCharts() {
         if (typeof Chart === 'undefined') return;
-        
-        const textColor = this.current.textSecondary;
-        const gridColor = this.current.border;
-        
-        Object.values(Chart.instances).forEach(chart => {
-            if (chart.options.scales?.x) {
-                chart.options.scales.x.grid.color = gridColor;
-                chart.options.scales.x.ticks.color = textColor;
+        Chart.defaults.color = this.current.textSecondary;
+        Chart.defaults.borderColor = this.current.border;
+        Object.values(Chart.instances).forEach(c => c.update());
+    },
+
+    lineChart(canvasId, labels, data) {
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (!ctx) return null;
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data,
+                    borderColor: '#D4AF37',
+                    backgroundColor: 'rgba(212,175,55,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#D4AF37',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: this.current.border } },
+                    x: { grid: { display: false } }
+                }
             }
-            if (chart.options.scales?.y) {
-                chart.options.scales.y.grid.color = gridColor;
-                chart.options.scales.y.ticks.color = textColor;
-            }
-            if (chart.options.plugins?.legend?.labels) {
-                chart.options.plugins.legend.labels.color = textColor;
-            }
-            chart.update();
         });
     },
-    
-    // Get status badge HTML
-    statusBadge(status) {
-        const labels = {
-            pending: 'Pending',
-            paid: 'Dibayar',
-            processing: 'Diproses',
-            shipped: 'Dikirim',
-            completed: 'Selesai',
-            cancelled: 'Dibatalkan'
-        };
-        const colors = {
-            pending: { bg: '#FEF3C7', text: '#92400E' },
-            paid: { bg: '#DBEAFE', text: '#1E40AF' },
-            processing: { bg: '#EDE9FE', text: '#6B21A8' },
-            shipped: { bg: '#CCFBF1', text: '#115E59' },
-            completed: { bg: '#D1FAE5', text: '#065F46' },
-            cancelled: { bg: '#FEE2E2', text: '#991B1B' }
-        };
-        const c = colors[status] || colors.pending;
-        return `<span style="background:${c.bg};color:${c.text};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${labels[status] || status}</span>`;
+
+    doughnutChart(canvasId, labels, data) {
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (!ctx) return null;
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: ['#FBBF24', '#3B82F6', '#8B5CF6', '#10B981', '#EF4444'],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, padding: 15 } }
+                }
+            }
+        });
     },
-    
-    // Format price
+
+    // ============================================
+    // HELPERS
+    // ============================================
     formatPrice(price) {
         return 'Rp ' + (price || 0).toLocaleString('id-ID');
     },
-    
-    // Format date
+
     formatDate(date) {
         return new Date(date).toLocaleDateString('id-ID', {
             year: 'numeric', month: 'short', day: 'numeric'
         });
     },
-    
-    // Render sidebar
+
+    statusBadge(status) {
+        const badges = {
+            pending: { bg: 'rgba(251,191,36,0.15)', color: '#FBBF24', label: 'Pending' },
+            paid: { bg: 'rgba(59,130,246,0.15)', color: '#3B82F6', label: 'Dibayar' },
+            processing: { bg: 'rgba(139,92,246,0.15)', color: '#8B5CF6', label: 'Diproses' },
+            shipped: { bg: 'rgba(20,184,166,0.15)', color: '#14B8A6', label: 'Dikirim' },
+            completed: { bg: 'rgba(16,185,129,0.15)', color: '#10B981', label: 'Selesai' },
+            cancelled: { bg: 'rgba(239,68,68,0.15)', color: '#EF4444', label: 'Dibatalkan' },
+        };
+        const b = badges[status] || badges.pending;
+        return `<span style="background:${b.bg};color:${b.color};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid ${b.color}30">${b.label}</span>`;
+    },
+
+    // ============================================
+    // SIDEBAR HTML
+    // ============================================
     renderSidebar(activePage) {
         const pages = [
-            { id: 'dashboard', icon: this.icons.dashboard, label: 'Dashboard', href: 'dashboard.html' },
-            { id: 'products', icon: this.icons.products, label: 'Produk', href: 'products.html' },
-            { id: 'orders', icon: this.icons.orders, label: 'Pesanan', href: 'orders.html' },
-            { id: 'customers', icon: this.icons.customers, label: 'Pelanggan', href: 'customers.html' },
-            { id: 'analytics', icon: this.icons.analytics, label: 'Analitik', href: 'analytics.html' },
-            { id: 'settings', icon: this.icons.settings, label: 'Pengaturan', href: 'settings.html' },
+            { id: 'dashboard', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', label: 'Dashboard', href: 'dashboard.html' },
+            { id: 'products', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', label: 'Produk', href: 'products.html' },
+            { id: 'orders', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', label: 'Pesanan', href: 'orders.html' },
+            { id: 'customers', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Pelanggan', href: 'customers.html' },
+            { id: 'analytics', icon: 'M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z', label: 'Analitik', href: 'analytics.html' },
+            { id: 'settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', label: 'Pengaturan', href: 'settings.html' },
         ];
-        
+
         return `
-            <aside class="sidebar">
-                <div class="logo">💎 GLEAM</div>
-                <nav class="flex-1">
+            <aside class="glass-sidebar w-64 text-white p-6 flex flex-col min-h-screen" role="navigation">
+                <div class="text-2xl font-bold text-gold-500 mb-8 tracking-wider">GLEAM</div>
+                <nav class="flex-1 space-y-2">
                     ${pages.map(p => `
-                        <a href="${p.href}" class="nav-item ${p.id === activePage ? 'active' : ''}">
-                            <span class="nav-icon">${p.icon}</span> ${p.label}
+                        <a href="${p.href}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${p.id === activePage ? 'glass-nav-active text-white' : 'text-gray-300 glass-nav-hover border border-transparent'}">
+                            <svg class="w-5 h-5 ${p.id === activePage ? 'text-white' : 'text-gray-400'}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="${p.icon}"></path></svg>
+                            ${p.label}
                         </a>
                     `).join('')}
                 </nav>
-                <div class="sidebar-footer">
-                    <div class="theme-toggle-row">
-                        <span>🌙 Dark Mode</span>
-                        <div class="toggle-track ${this.isDark ? 'active' : ''}" id="themeToggle">
-                            <div class="toggle-thumb"></div>
+                <div style="border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; margin-bottom: 8px;">
+                        <span style="font-size: 13px; color: var(--text-secondary);">${this.isDark ? '🌙' : '☀️'} Dark Mode</span>
+                        <div id="themeToggle" style="width: 44px; height: 24px; background: ${this.isDark ? '#D4AF37' : '#D1D5DB'}; border-radius: 12px; cursor: pointer; position: relative; transition: all 0.3s;">
+                            <div id="toggleThumb" style="width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; ${this.isDark ? 'right: 2px;' : 'left: 2px;'} transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>
                         </div>
                     </div>
-                    <button onclick="GleamTheme.logout()" class="logout-btn">
-                        ${this.icons.logout} Logout
+                    <button onclick="GleamTheme.logout()" class="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl w-full transition-colors font-medium">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Logout
                     </button>
                 </div>
             </aside>
         `;
     },
-    
-    // Create chart
-    createChart(canvasId, type, data, options = {}) {
-        const ctx = document.getElementById(canvasId)?.getContext('2d');
-        if (!ctx) return null;
-        
-        return new Chart(ctx, {
-            type,
-            data,
-            options: { ...this.chartDefaults, ...options }
-        });
+
+    // ============================================
+    // AUTH
+    // ============================================
+    async checkAuth() {
+        if (typeof supabaseClient === 'undefined') return null;
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) window.location.href = 'login.html';
+        return session;
     },
-    
-    // Line chart helper
-    lineChart(canvasId, labels, data, label = 'Revenue') {
-        return this.createChart(canvasId, 'line', {
-            labels,
-            datasets: [{
-                label,
-                data,
-                borderColor: this.chartColors.gold,
-                backgroundColor: this.chartColors.goldLight,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-            }]
-        }, {
-            plugins: { legend: { display: false } }
-        });
-    },
-    
-    // Doughnut chart helper
-    doughnutChart(canvasId, labels, data, colors) {
-        return this.createChart(canvasId, 'doughnut', {
-            labels,
-            datasets: [{
-                data,
-                backgroundColor: colors || Object.values(this.chartColors),
-                borderWidth: 2,
-                borderColor: '#fff',
-            }]
-        });
-    },
-    
-    // Bar chart helper
-    barChart(canvasId, labels, data, label = 'Total') {
-        return this.createChart(canvasId, 'bar', {
-            labels,
-            datasets: [{
-                label,
-                data,
-                backgroundColor: this.chartColors.gold,
-                borderRadius: 8,
-            }]
-        }, {
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 1 } }
-            }
-        });
-    },
-    
-    // Logout
+
     async logout() {
         if (typeof supabaseClient !== 'undefined') {
             await supabaseClient.auth.signOut();
         }
         window.location.href = 'login.html';
-    },
-    
-    // Check auth
-    async checkAuth() {
-        if (typeof supabaseClient === 'undefined') return;
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) window.location.href = 'login.html';
-        return session;
     }
 };
 
-// Auto-init on page load
-document.addEventListener('DOMContentLoaded', () => {
-    GleamTheme.init();
-});
+// Auto-init
+document.addEventListener('DOMContentLoaded', () => GleamTheme.init());
