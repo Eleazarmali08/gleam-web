@@ -35,16 +35,11 @@
         // Local bar chart instance
         let topProductsChart = null;
 
-        let analyticsLoaded = false;
-
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('analytics');
             GleamTheme.init();
             await GleamTheme.checkAuth();
-            if (!analyticsLoaded) {
-                analyticsLoaded = true;
-                await loadAnalytics();
-            }
+            await loadAnalytics();
         });
 
         async function loadAnalytics(){
@@ -64,7 +59,7 @@
             // Get customer count
             const { count: custCount } = await supabaseClient
                 .from('profiles')
-                .select('*', { count: 'exact' })
+                .select('*', { count: 'exact', head: true })
                 .eq('role', 'customer');
 
             // ===== Revenue Trend (7 days) =====
@@ -115,56 +110,54 @@
             const bestDayIndex = dailyValues.indexOf(maxRevenue);
             document.getElementById('bestDay').textContent = (maxRevenue > 0 ? labels[bestDayIndex] : '-') || '-';
 
-            // Wrap chart creation in setTimeout to ensure DOM is ready
-            setTimeout(() => {
-                if (document.getElementById('revenueTrend')) {
-                    GleamTheme.lineChart('revenueTrend', labels, Object.values(daily));
-                }
+            // Charts render directly — DOM is already ready inside DOMContentLoaded
+            if (document.getElementById('revenueTrend')) {
+                GleamTheme.lineChart('revenueTrend', labels, Object.values(daily));
+            }
 
-                if (document.getElementById('topProducts')) {
-                    const topProductsCanvas = document.getElementById('topProducts');
-                    const existing = Chart.getChart(topProductsCanvas);
-                    if (existing) existing.destroy();
+            if (document.getElementById('topProducts')) {
+                const topProductsCanvas = document.getElementById('topProducts');
+                const existing = Chart.getChart(topProductsCanvas);
+                if (existing) existing.destroy();
 
-                    topProductsChart = new Chart(topProductsCanvas, {
-                        type: 'bar',
-                        data: {
-                            labels: topProducts.map(p => p[0].substring(0, 20)),
-                            datasets: [{
-                                label: 'Terjual',
-                                data: topProducts.map(p => p[1]),
-                                backgroundColor: '#D4AF37',
-                                borderRadius: 8
-                            }]
-                        },
-                        options: {
-                            indexAxis: 'y',
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { grid: { color: GleamTheme.current.border } },
-                                y: { grid: { display: false } }
-                            }
+                topProductsChart = new Chart(topProductsCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: topProducts.map(p => p[0].substring(0, 20)),
+                        datasets: [{
+                            label: 'Terjual',
+                            data: topProducts.map(p => p[1]),
+                            backgroundColor: '#D4AF37',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: GleamTheme.current.border } },
+                            y: { grid: { display: false } }
                         }
-                    });
-                    GleamTheme.chartInstances['topProducts'] = topProductsChart;
-                }
+                    }
+                });
+                GleamTheme.chartInstances['topProducts'] = topProductsChart;
+            }
 
-                if (document.getElementById('statusDistribution')) {
-                    GleamTheme.doughnutChart('statusDistribution',
-                        ['Pending', 'Dibayar', 'Diproses', 'Dikirim', 'Selesai'],
-                        [
-                            statusCounts.pending || 0,
-                            statusCounts.paid || 0,
-                            statusCounts.processing || 0,
-                            statusCounts.shipped || 0,
-                            statusCounts.completed || 0
-                        ]
-                    );
-                }
-            }, 500);
+            if (document.getElementById('statusDistribution')) {
+                GleamTheme.doughnutChart('statusDistribution',
+                    ['Pending', 'Dibayar', 'Diproses', 'Dikirim', 'Selesai'],
+                    [
+                        statusCounts.pending || 0,
+                        statusCounts.paid || 0,
+                        statusCounts.processing || 0,
+                        statusCounts.shipped || 0,
+                        statusCounts.completed || 0
+                    ]
+                );
+            }
         }
     </script>
 </body>

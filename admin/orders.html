@@ -92,7 +92,11 @@
 
         async function updateStatus(id, s){
             if(!s) return;
-            await supabaseClient.from('orders').update({ status: s, updated_at: new Date() }).eq('id', id);
+            const { error } = await supabaseClient.from('orders').update({ status: s, updated_at: new Date().toISOString() }).eq('id', id);
+            if (error) {
+                alert('Gagal update status: ' + error.message);
+                return;
+            }
             await loadOrders();
         }
     </script>

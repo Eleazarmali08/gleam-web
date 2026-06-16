@@ -15,25 +15,7 @@
                     }
                 }
             }
-        }
-        // Di dashboard.html & analytics.html, tambahkan di awal script:
-        let chartInstances = {};
-
-        function destroyChart(key) {
-            if (chartInstances[key]) {
-                chartInstances[key].destroy();
-                delete chartInstances[key];
-            }
-        }
-
-        function destroyAllCharts() {
-            Object.keys(chartInstances).forEach(key => {
-                if (chartInstances[key]) {
-                    chartInstances[key].destroy();
-                }
-            });
-            chartInstances = {};
-        }        
+        };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -146,26 +128,24 @@
 
             const { labels, data } = getLast7DaysRevenue(safeOrders);
 
-            // Wrap chart creation in setTimeout to ensure DOM is ready
-            setTimeout(() => {
-                if (document.getElementById('revenueChart')) {
-                    GleamTheme.lineChart('revenueChart', labels, data);
-                }
+            // Charts render directly — DOM is already ready inside DOMContentLoaded
+            if (document.getElementById('revenueChart')) {
+                GleamTheme.lineChart('revenueChart', labels, data);
+            }
 
-                if (document.getElementById('orderStatusChart')) {
-                    const statusCounts = safeOrders.reduce((acc, order) => {
-                        acc[order.status] = (acc[order.status] || 0) + 1;
-                        return acc;
-                    }, {});
+            if (document.getElementById('orderStatusChart')) {
+                const statusCounts = safeOrders.reduce((acc, order) => {
+                    acc[order.status] = (acc[order.status] || 0) + 1;
+                    return acc;
+                }, {});
 
-                    GleamTheme.doughnutChart('orderStatusChart', ['Pending', 'Dibayar', 'Diproses', 'Selesai'], [
-                        statusCounts.pending || 0,
-                        statusCounts.paid || 0,
-                        statusCounts.processing || 0,
-                        statusCounts.completed || 0,
-                    ]);
-                }
-            }, 500);
+                GleamTheme.doughnutChart('orderStatusChart', ['Pending', 'Dibayar', 'Diproses', 'Selesai'], [
+                    statusCounts.pending || 0,
+                    statusCounts.paid || 0,
+                    statusCounts.processing || 0,
+                    statusCounts.completed || 0,
+                ]);
+            }
 
             const recentOrders = safeOrders.slice(0, 5);
             document.getElementById('recentOrders').innerHTML = recentOrders.map(order => `

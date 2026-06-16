@@ -80,6 +80,7 @@
         function openBankModal(){
             document.getElementById('bankId').value = '';
             document.getElementById('bankForm').reset();
+            document.querySelector('#bankModal h3').textContent = 'Tambah Rekening';
             document.getElementById('bankModal').style.display = 'flex';
         }
 
@@ -100,23 +101,32 @@
             document.getElementById('bankName').value = data.bank_name;
             document.getElementById('bankNumber').value = data.account_number;
             document.getElementById('bankHolder').value = data.account_holder;
+            document.querySelector('#bankModal h3').textContent = 'Edit Rekening';
             document.getElementById('bankModal').style.display = 'flex';
         }
 
         document.getElementById('bankForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('bankId').value;
+            const bankName = document.getElementById('bankName').value;
+            if (!bankName) { alert('Pilih bank terlebih dahulu'); return; }
             const payload = {
-                bank_name: document.getElementById('bankName').value,
+                bank_name: bankName,
                 account_number: document.getElementById('bankNumber').value,
                 account_holder: document.getElementById('bankHolder').value,
                 is_active: true
             };
 
+            let error;
             if (id) {
-                await supabaseClient.from('payment_accounts').update(payload).eq('id', id);
+                ({ error } = await supabaseClient.from('payment_accounts').update(payload).eq('id', id));
             } else {
-                await supabaseClient.from('payment_accounts').insert(payload);
+                ({ error } = await supabaseClient.from('payment_accounts').insert(payload));
+            }
+
+            if (error) {
+                alert('Gagal menyimpan: ' + error.message);
+                return;
             }
 
             closeBankModal();
@@ -125,7 +135,11 @@
 
         async function deleteBank(id){
             if (!confirm('Hapus rekening?')) return;
-            await supabaseClient.from('payment_accounts').delete().eq('id', id);
+            const { error } = await supabaseClient.from('payment_accounts').delete().eq('id', id);
+            if (error) {
+                alert('Gagal menghapus: ' + error.message);
+                return;
+            }
             await loadBanks();
         }
 

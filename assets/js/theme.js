@@ -347,9 +347,12 @@ const GleamTheme = {
             });
             this.chartInstances = {};
         }
-        Chart.helpers.each(Chart.instances, instance => {
-            if (instance) instance.destroy();
-        });
+        // Clean up any orphaned Chart.js instances
+        if (typeof Chart !== 'undefined' && Chart.instances) {
+            Object.values(Chart.instances).forEach(instance => {
+                if (instance) instance.destroy();
+            });
+        }
     },
 
     // ============================================
@@ -436,5 +439,4 @@ const GleamTheme = {
     }
 };
 
-// Auto-init
-document.addEventListener('DOMContentLoaded', () => GleamTheme.init());
+// NOTE: Do NOT auto-init here. Each page calls GleamTheme.init() in its own DOMContentLoaded handler.
