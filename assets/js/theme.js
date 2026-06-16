@@ -277,24 +277,36 @@ const GleamTheme = {
 
     lineChart(canvasId, labels, data, options = {}) {
         const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
+        if (!canvas) {
+            console.warn('❌ Canvas not found:', canvasId);
+            return null;
+        }
 
+        console.log('📊 lineChart:', canvasId, { labels, data }); // DEBUG
+
+        // Destroy existing
         this.destroyChart(canvasId);
 
         const ctx = canvas.getContext('2d');
+        
+        // ✅ Pastikan canvas terlihat
+        canvas.style.display = 'block';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels || [],
+                labels: labels || ['No Data'],
                 datasets: [{
                     label: options.label || 'Revenue',
-                    data: data || [],
+                    data: (data && data.length > 0) ? data : [0],
                     borderColor: options.borderColor || this.chartColors.gold,
-                    backgroundColor: options.backgroundColor || this.hexToRgba(this.chartColors.gold, 0.1),
+                    backgroundColor: options.backgroundColor || this.hexToRgba(this.chartColors.gold, 0.15),
                     fill: true,
                     tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 3,
+                    borderWidth: 3,
+                    pointRadius: (data && data.length > 1) ? 3 : 0,
                     pointHoverRadius: 5,
                     pointBackgroundColor: options.pointColor || this.chartColors.gold,
                 }]
@@ -305,27 +317,31 @@ const GleamTheme = {
                 animation: false,
                 plugins: {
                     legend: { display: options.showLegend || false },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => 'Rp ' + (ctx.parsed?.y || 0).toLocaleString('id-ID')
-                        }
-                    }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: this.current.border },
-                        ticks: { color: this.current.textSecondary, font: { size: 10 } }
+                        grid: { color: this.current.border || 'rgba(255,255,255,0.1)' },
+                        ticks: { 
+                            color: this.current.textSecondary || '#999',
+                            font: { size: 10 },
+                            callback: (value) => {
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000).toFixed(0) + 'M';
+                                if (value >= 1000) return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                                return 'Rp ' + value;
+                            }
+                        }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: this.current.textSecondary, font: { size: 10 } }
+                        ticks: { color: this.current.textSecondary || '#999', font: { size: 10 } }
                     }
                 }
             }
         });
 
         this.chartInstances[canvasId] = chart;
+        console.log('✅ Chart created:', canvasId, chart); // DEBUG
         return chart;
     },
 

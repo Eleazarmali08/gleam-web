@@ -16,6 +16,40 @@
                 }
             }
         };
+        async function loadDashboard() {
+    GleamTheme.destroyAllCharts(); // ✅ Hancurkan semua dulu
+
+    const { data: orders } = await supabaseClient
+        .from('orders')
+        .select('*, profiles(full_name)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    console.log('📦 Orders loaded:', orders?.length); // DEBUG
+
+    // ... update stats ...
+
+    const { labels, data } = getLast7DaysRevenue(orders || []);
+    console.log('📊 Revenue data:', { labels, data }); // DEBUG
+
+    // ✅ Delay untuk pastikan DOM ready
+    setTimeout(() => {
+        if (document.getElementById('revenueChart')) {
+            console.log('📊 Creating revenue chart...'); // DEBUG
+            GleamTheme.lineChart('revenueChart', labels, data);
+        }
+        
+        if (document.getElementById('orderStatusChart')) {
+            console.log('📊 Creating status chart...'); // DEBUG
+            const sc = {};
+            orders?.forEach(o => { sc[o.status] = (sc[o.status] || 0) + 1; });
+            GleamTheme.doughnutChart('orderStatusChart', 
+                ['Pending', 'Dibayar', 'Diproses', 'Selesai'],
+                [sc.pending || 0, sc.paid || 0, sc.processing || 0, sc.completed || 0]
+            );
+        }
+    }, 500);
+}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
