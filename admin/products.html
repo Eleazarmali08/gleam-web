@@ -20,31 +20,254 @@
     <main class="flex-1 p-8">
         <header class="flex justify-between items-center mb-8 fade-in">
             <div><h1 class="text-3xl font-extrabold" style="color:var(--text)">Produk</h1><p style="color:var(--text-secondary)" class="mt-1 text-sm">Kelola semua produk</p></div>
-            <button onclick="openModal()" class="btn-gold px-5 py-3 rounded-xl font-semibold text-sm">➕ Tambah Produk</button>
+            <button onclick="openModal()" class="btn-gold px-5 py-3 rounded-xl font-semibold text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <span class="ml-2">Tambah Produk</span>
+            </button>
         </header>
         <div class="glass-card p-4 mb-6 flex gap-4 fade-in">
-            <input type="text" id="searchInput" placeholder="🔍 Cari produk..." class="flex-1 px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)" oninput="loadProducts()">
+            <input type="text" id="searchInput" placeholder="Cari produk..." class="flex-1 px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)" oninput="loadProducts()">
             <select id="categoryFilter" onchange="loadProducts()" class="px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"><option value="">Semua Kategori</option></select>
         </div>
         <div class="glass-card overflow-hidden fade-in">
             <table class="w-full text-left"><thead><tr class="text-sm border-b bg-opacity-50" style="background:var(--input-bg);border-color:var(--border)"><th class="p-4">Produk</th><th class="p-4">Kategori</th><th class="p-4">Harga</th><th class="p-4">Stok</th><th class="p-4">Status</th><th class="p-4">Aksi</th></tr></thead><tbody id="productsTable"><tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Loading...</td></tr></tbody></table>
         </div>
     </main>
-    <div id="productModal" class="modal"><div class="glass-card p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto" style="margin:20px"><div class="flex justify-between items-center mb-6"><h2 id="modalTitle" class="text-xl font-bold" style="color:var(--text)">Tambah Produk</h2><button onclick="closeModal()" class="text-2xl" style="color:var(--text-secondary)">&times;</button></div><form id="productForm" class="space-y-4"><input type="hidden" id="productId"><div class="grid grid-cols-2 gap-4"><div class="col-span-2"><label class="block text-sm mb-1" style="color:var(--text-secondary)">Nama</label><input type="text" id="productName" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></div><div><label class="block text-sm mb-1" style="color:var(--text-secondary)">Harga (Rp)</label><input type="number" id="productPrice" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></div><div><label class="block text-sm mb-1" style="color:var(--text-secondary)">Berat (g)</label><input type="number" id="productWeight" step="0.1" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></div><div><label class="block text-sm mb-1" style="color:var(--text-secondary)">Karat</label><select id="productKarat" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"><option value="18K">18K</option><option value="22K">22K</option><option value="24K">24K</option></select></div><div><label class="block text-sm mb-1" style="color:var(--text-secondary)">Stok</label><input type="number" id="productStock" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></div><div><label class="block text-sm mb-1" style="color:var(--text-secondary)">Kategori</label><select id="productCategory" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></select></div><div class="col-span-2"><label class="block text-sm mb-1" style="color:var(--text-secondary)">Deskripsi</label><textarea id="productDesc" rows="3" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></textarea></div></div><div class="flex gap-3 justify-end mt-6"><button type="button" onclick="closeModal()" class="px-6 py-2 rounded-xl text-sm" style="border:1px solid var(--border);color:var(--text)">Batal</button><button type="submit" class="btn-gold px-6 py-2 rounded-xl text-sm font-semibold">Simpan</button></div></form></div></div>
+    <div id="productModal" class="modal"><div class="glass-card p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto" style="margin:20px"><div class="flex justify-between items-center mb-6"><h2 id="modalTitle" class="text-xl font-bold" style="color:var(--text)">Tambah Produk</h2><button onclick="closeModal()" class="text-2xl" style="color:var(--text-secondary)"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+        <form id="productForm" class="space-y-4">
+            <input type="hidden" id="productId">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Nama</label>
+                    <input type="text" id="productName" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Harga (Rp)</label>
+                    <input type="number" id="productPrice" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Berat (g)</label>
+                    <input type="number" id="productWeight" step="0.1" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Karat</label>
+                    <select id="productKarat" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"><option value="18K">18K</option><option value="22K">22K</option><option value="24K">24K</option></select>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Stok</label>
+                    <input type="number" id="productStock" required class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Kategori</label>
+                    <select id="productCategory" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></select>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Deskripsi</label>
+                    <textarea id="productDesc" rows="3" class="w-full px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"></textarea>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm mb-1" style="color:var(--text-secondary)">Gambar</label>
+                    <input type="file" id="productImage" accept="image/*" class="w-full text-sm" />
+                    <div id="imagePreview" class="mt-3 flex items-center gap-3"></div>
+                </div>
+                <div class="flex items-center gap-4 col-span-2 mt-2">
+                    <label class="flex items-center gap-2" style="color:var(--text)"><input type="checkbox" id="productActive"> <span style="color:var(--text-secondary)">Aktif</span></label>
+                    <label class="flex items-center gap-2" style="color:var(--text)"><input type="checkbox" id="productFeatured"> <span style="color:var(--text-secondary)">Featured</span></label>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-6"><button type="button" onclick="closeModal()" class="px-6 py-2 rounded-xl text-sm" style="border:1px solid var(--border);color:var(--text)">Batal</button><button type="submit" class="btn-gold px-6 py-2 rounded-xl text-sm font-semibold">Simpan</button></div>
+        </form>
+    </div></div>
     <script>
         const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        let selectedImageFile = null;
+
         document.addEventListener('DOMContentLoaded',async()=>{
-            document.getElementById('sidebar-container').innerHTML=GleamTheme.renderSidebar('products');
-            GleamTheme.init();await GleamTheme.checkAuth();
-            loadCategories();loadProducts();
+            document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('products');
+            GleamTheme.init();
+            await GleamTheme.checkAuth();
+            await loadCategories();
+            await loadProducts();
+
+            document.getElementById('productImage').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                selectedImageFile = file || null;
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = '';
+                if (file) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.className = 'w-20 h-20 rounded-lg object-cover';
+                    preview.appendChild(img);
+                }
+            });
         });
-        async function loadCategories(){const{data}=await supabaseClient.from('categories').select('*');const s=document.getElementById('productCategory');const f=document.getElementById('categoryFilter');const opt=data?.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')||'';s.innerHTML=opt;f.innerHTML='<option value="">Semua Kategori</option>'+opt}
-        async function loadProducts(){const s=document.getElementById('searchInput').value;const c=document.getElementById('categoryFilter').value;let q=supabaseClient.from('products').select('*,categories(name),product_images(image_url,is_primary)').order('created_at',{ascending:false});if(s)q=q.ilike('name',`%${s}%`);if(c)q=q.eq('category_id',c);const{data}=await q;document.getElementById('productsTable').innerHTML=data?.map(p=>`<tr class="border-b" style="border-color:var(--border)"><td class="p-4"><div class="flex items-center gap-3"><img src="${p.product_images?.find(i=>i.is_primary)?.image_url||p.product_images?.[0]?.image_url||'https://placehold.co/48/D4AF37/white?text=G'}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/48/D4AF37/white?text=G'"><div><div class="font-medium" style="color:var(--text)">${p.name}</div><div class="text-xs" style="color:var(--text-secondary)">${p.karat} • ${p.weight}g</div></div></div></td><td class="p-4 text-sm" style="color:var(--text-secondary)">${p.categories?.name||'-'}</td><td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(p.price)}</td><td class="p-4 text-sm" style="color:var(--text)">${p.stock}</td><td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold" style="background:${p.is_active?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)'};color:${p.is_active?'#10B981':'#EF4444'}">${p.is_active?'Aktif':'Nonaktif'}</span></td><td class="p-4"><div class="flex gap-2"><button onclick="editProduct('${p.id}')" class="text-blue-500">✏️</button><button onclick="deleteProduct('${p.id}')" class="text-red-500">🗑️</button></div></td></tr>`).join('')||'<tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada produk</td></tr>'}
-        function openModal(){document.getElementById('modalTitle').textContent='Tambah Produk';document.getElementById('productId').value='';document.getElementById('productForm').reset();document.getElementById('productModal').classList.add('active')}
-        function closeModal(){document.getElementById('productModal').classList.remove('active')}
-        async function editProduct(id){const{data}=await supabaseClient.from('products').select('*').eq('id',id).single();if(!data)return;document.getElementById('modalTitle').textContent='Edit Produk';document.getElementById('productId').value=data.id;document.getElementById('productName').value=data.name;document.getElementById('productPrice').value=data.price;document.getElementById('productWeight').value=data.weight;document.getElementById('productKarat').value=data.karat;document.getElementById('productStock').value=data.stock;document.getElementById('productCategory').value=data.category_id||'';document.getElementById('productDesc').value=data.description||'';document.getElementById('productModal').classList.add('active')}
-        document.getElementById('productForm').addEventListener('submit',async(e)=>{e.preventDefault();const id=document.getElementById('productId').value;const d={name:document.getElementById('productName').value,price:parseFloat(document.getElementById('productPrice').value),weight:parseFloat(document.getElementById('productWeight').value),karat:document.getElementById('productKarat').value,stock:parseInt(document.getElementById('productStock').value),category_id:document.getElementById('productCategory').value||null,description:document.getElementById('productDesc').value};if(id){await supabaseClient.from('products').update(d).eq('id',id)}else{d.slug=d.name.toLowerCase().replace(/\s+/g,'-');await supabaseClient.from('products').insert(d)}closeModal();loadProducts()});
-        async function deleteProduct(id){if(confirm('Hapus produk?')){await supabaseClient.from('product_images').delete().eq('product_id',id);await supabaseClient.from('products').delete().eq('id',id);loadProducts()}}
+
+        async function loadCategories(){
+            const { data } = await supabaseClient.from('categories').select('*').order('name');
+            const s = document.getElementById('productCategory');
+            const f = document.getElementById('categoryFilter');
+            const opt = data?.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')||'';
+            s.innerHTML = opt;
+            f.innerHTML = '<option value="">Semua Kategori</option>' + opt;
+            return data || [];
+        }
+
+        async function loadProducts(){
+            const sVal = document.getElementById('searchInput').value;
+            const cVal = document.getElementById('categoryFilter').value;
+            let q = supabaseClient.from('products').select('*, categories(name), product_images(image_url,is_primary)').order('created_at', { ascending: false });
+            if (sVal) q = q.ilike('name', `%${sVal}%`);
+            if (cVal) q = q.eq('category_id', cVal);
+            const { data } = await q;
+
+            document.getElementById('productsTable').innerHTML = (data?.map(p=>{
+                const thumb = p.product_images?.find(i=>i.is_primary)?.image_url || p.product_images?.[0]?.image_url || 'https://placehold.co/48/D4AF37/white?text=G';
+                return `
+                    <tr class="border-b" style="border-color:var(--border)">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${thumb}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/48/D4AF37/white?text=G'">
+                                <div>
+                                    <div class="font-medium" style="color:var(--text)">${p.name}</div>
+                                    <div class="text-xs" style="color:var(--text-secondary)">${p.karat} • ${p.weight}g</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-sm" style="color:var(--text-secondary)">${p.categories?.name||'-'}</td>
+                        <td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(p.price)}</td>
+                        <td class="p-4 text-sm" style="color:var(--text)">${p.stock}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold" style="background:${p.is_active?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)'};color:${p.is_active?'#10B981':'#EF4444'}">${p.is_active?'Aktif':'Nonaktif'}</span></td>
+                        <td class="p-4">
+                            <div class="flex gap-2">
+                                <button onclick="editProduct('${p.id}')" class="p-2 rounded-md hover:bg-gray-100" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3L12 14H9v-3z"></path></svg>
+                                </button>
+                                <button onclick="deleteProduct('${p.id}')" class="p-2 rounded-md hover:bg-gray-100" title="Hapus">
+                                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }) || []).join('') || '<tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada produk</td></tr>';
+        }
+
+        function openModal(){
+            document.getElementById('modalTitle').textContent = 'Tambah Produk';
+            document.getElementById('productId').value = '';
+            document.getElementById('productForm').reset();
+            selectedImageFile = null;
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('productActive').checked = true;
+            document.getElementById('productFeatured').checked = false;
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeModal(){
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        async function editProduct(id){
+            const { data } = await supabaseClient.from('products').select('*, product_images(image_url,is_primary)').eq('id', id).single();
+            if (!data) return;
+            document.getElementById('modalTitle').textContent = 'Edit Produk';
+            document.getElementById('productId').value = data.id;
+            document.getElementById('productName').value = data.name;
+            document.getElementById('productPrice').value = data.price;
+            document.getElementById('productWeight').value = data.weight;
+            document.getElementById('productKarat').value = data.karat;
+            document.getElementById('productStock').value = data.stock;
+            document.getElementById('productCategory').value = data.category_id||'';
+            document.getElementById('productDesc').value = data.description||'';
+            document.getElementById('productActive').checked = !!data.is_active;
+            document.getElementById('productFeatured').checked = !!data.is_featured;
+
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            const imgUrl = data.product_images?.find(i=>i.is_primary)?.image_url || data.product_images?.[0]?.image_url;
+            if (imgUrl) {
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.className = 'w-20 h-20 rounded-lg object-cover';
+                preview.appendChild(img);
+            }
+
+            selectedImageFile = null;
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const payload = {
+                name: document.getElementById('productName').value,
+                price: parseFloat(document.getElementById('productPrice').value) || 0,
+                weight: parseFloat(document.getElementById('productWeight').value) || 0,
+                karat: document.getElementById('productKarat').value,
+                stock: parseInt(document.getElementById('productStock').value) || 0,
+                category_id: document.getElementById('productCategory').value || null,
+                description: document.getElementById('productDesc').value || '',
+                is_active: document.getElementById('productActive').checked,
+                is_featured: document.getElementById('productFeatured').checked,
+            };
+
+            if (id) {
+                await supabaseClient.from('products').update(payload).eq('id', id);
+            } else {
+                payload.slug = payload.name.toLowerCase().replace(/\s+/g, '-');
+                const { data: insertData } = await supabaseClient.from('products').insert(payload).select().single();
+                if (insertData && insertData.id) {
+                    // set id to newly created product
+                    document.getElementById('productId').value = insertData.id;
+                }
+            }
+
+            const finalId = document.getElementById('productId').value || (payload.id);
+
+            // Handle image upload if a file was selected
+            if (selectedImageFile && finalId) {
+                try {
+                    // If updating, clear existing primary
+                    await supabaseClient.from('product_images').update({ is_primary: false }).eq('product_id', finalId);
+
+                    const path = `products/${finalId}/${Date.now()}_${selectedImageFile.name}`;
+                    const { error: uploadErr } = await supabaseClient.storage.from('product-images').upload(path, selectedImageFile, { cacheControl: '3600', upsert: false });
+                    if (uploadErr) console.error('Upload error', uploadErr.message);
+                    const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(path);
+                    const publicUrl = urlData?.publicUrl || '';
+                    await supabaseClient.from('product_images').insert({ product_id: finalId, image_url: publicUrl, is_primary: true });
+                } catch (err) {
+                    console.error('Image upload failed', err);
+                }
+            }
+
+            closeModal();
+            await loadProducts();
+        });
+
+        async function deleteProduct(id){
+            if (!confirm('Hapus produk?')) return;
+
+            // fetch images
+            const { data: imgs } = await supabaseClient.from('product_images').select('image_url').eq('product_id', id);
+            if (Array.isArray(imgs)){
+                for (const img of imgs) {
+                    try {
+                        const parts = (img.image_url||'').split('/product-images/');
+                        if (parts[1]) {
+                            const objectPath = decodeURIComponent(parts[1]);
+                            await supabaseClient.storage.from('product-images').remove([objectPath]);
+                        }
+                    } catch(e){ console.warn('Failed to delete storage object', e); }
+                }
+            }
+
+            await supabaseClient.from('product_images').delete().eq('product_id', id);
+            await supabaseClient.from('products').delete().eq('id', id);
+            await loadProducts();
+        }
     </script>
 </body>
 </html>

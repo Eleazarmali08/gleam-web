@@ -15,8 +15,12 @@
     <main class="flex-1 p-8">
         <header class="mb-8 fade-in"><h1 class="text-3xl font-extrabold" style="color:var(--text)">Analitik</h1><p style="color:var(--text-secondary)" class="mt-1 text-sm">Visualisasi data penjualan</p></header>
         <div class="grid grid-cols-2 gap-6 mb-8 fade-in">
-            <div class="glass-card p-6"><h3 class="font-semibold text-lg mb-4" style="color:var(--text)">Revenue Trend</h3><canvas id="revenueTrend" height="250"></canvas></div>
-            <div class="glass-card p-6"><h3 class="font-semibold text-lg mb-4" style="color:var(--text)">Top Products</h3><canvas id="topProducts" height="250"></canvas></div>
+            <div class="glass-card p-6"><h3 class="font-semibold text-lg mb-4 flex items-center gap-2" style="color:var(--text)"><svg class="w-5 h-5" style="color:#D4AF37" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>Revenue Trend</h3><canvas id="revenueTrend" height="250"></canvas></div>
+            <div class="glass-card p-6"><h3 class="font-semibold text-lg mb-4 flex items-center gap-2" style="color:var(--text)"><svg class="w-5 h-5" style="color:#D4AF37" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>Top Products</h3><canvas id="topProducts" height="250"></canvas></div>
+        </div>
+        <div class="glass-card p-6 mb-8 fade-in">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2" style="color:var(--text)"><svg class="w-5 h-5" style="color:#D4AF37" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>Status Distribution</h3>
+            <div style="max-width: 300px; margin: 0 auto;"><canvas id="statusDistribution" height="200"></canvas></div>
         </div>
         <div class="grid grid-cols-4 gap-6 fade-in">
             <div class="glass-stat-card text-center"><div class="text-3xl font-bold" style="color:var(--gold)" id="avgOrder">Rp 0</div><div class="text-sm mt-2" style="color:var(--text-secondary)">Rata-rata Pesanan</div></div>
@@ -26,25 +30,114 @@
         </div>
     </main>
     <script>
-        const supabaseClient=window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
-        document.addEventListener('DOMContentLoaded',async()=>{
-            document.getElementById('sidebar-container').innerHTML=GleamTheme.renderSidebar('analytics');
-            GleamTheme.init();await GleamTheme.checkAuth();loadAnalytics();
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('analytics');
+            GleamTheme.init();
+            await GleamTheme.checkAuth();
+            await loadAnalytics();
         });
+
         async function loadAnalytics(){
-            const{data:orders}=await supabaseClient.from('orders').select('*,order_items(*)').order('created_at',{ascending:true});
-            const{data:products}=await supabaseClient.from('products').select('*,categories(name)');
-            const{count:custCount}=await supabaseClient.from('profiles').select('*',{count:'exact'}).eq('role','customer');
-            const daily={};const labels=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(d.toLocaleDateString('id-ID',{weekday:'short'}));daily[d.toISOString().split('T')[0]]=0}
-            orders?.forEach(o=>{const ds=new Date(o.created_at).toISOString().split('T')[0];if(daily.hasOwnProperty(ds))daily[ds]+=(o.total_price||0)});
-            GleamTheme.lineChart('revenueTrend',labels,Object.values(daily));
-            const ps={};orders?.forEach(o=>{o.order_items?.forEach(i=>{ps[i.product_name]=ps[i.product_name]||0+i.quantity})});const tp=Object.entries(ps).sort((a,b)=>b[1]-a[1]).slice(0,5);
-            new Chart(document.getElementById('topProducts'),{type:'bar',data:{labels:tp.map(p=>p[0].substring(0,20)),datasets:[{label:'Terjual',data:tp.map(p=>p[1]),backgroundColor:'#D4AF37',borderRadius:8}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
-            const totalRevenue=orders?.reduce((s,o)=>s+(o.total_price||0),0)||0;const totalOrders=orders?.length||0;
-            document.getElementById('avgOrder').textContent=GleamTheme.formatPrice(totalOrders>0?totalRevenue/totalOrders:0);
-            document.getElementById('totalCust').textContent=custCount||0;
-            document.getElementById('convRate').textContent=(custCount>0?Math.round((totalOrders/custCount)*100):0)+'%';
-            document.getElementById('bestDay').textContent=labels[Object.values(daily).indexOf(Math.max(...Object.values(daily)))]||'-';
+            // Fetch orders with order items
+            const { data: orders } = await supabaseClient
+                .from('orders')
+                .select('*, order_items(*)')
+                .order('created_at', { ascending: true });
+
+            // Fetch products with categories
+            const { data: products } = await supabaseClient
+                .from('products')
+                .select('*, categories(name)');
+
+            // Get customer count
+            const { count: custCount } = await supabaseClient
+                .from('profiles')
+                .select('*', { count: 'exact' })
+                .eq('role', 'customer');
+
+            // ===== Revenue Trend (7 days) =====
+            const daily = {};
+            const labels = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
+                daily[key] = 0;
+            }
+            orders?.forEach(o => {
+                const ds = new Date(o.created_at).toISOString().split('T')[0];
+                if (daily.hasOwnProperty(ds)) daily[ds] += (o.total_price || 0);
+            });
+            GleamTheme.lineChart('revenueTrend', labels, Object.values(daily));
+
+            // ===== Top Products (horizontal bar) =====
+            const productSales = {};
+            orders?.forEach(o => {
+                o.order_items?.forEach(item => {
+                    const pname = item.product_name || 'Unknown';
+                    productSales[pname] = (productSales[pname] || 0) + (item.quantity || 0);
+                });
+            });
+            const topProducts = Object.entries(productSales)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            new Chart(document.getElementById('topProducts'), {
+                type: 'bar',
+                data: {
+                    labels: topProducts.map(p => p[0].substring(0, 20)),
+                    datasets: [{
+                        label: 'Terjual',
+                        data: topProducts.map(p => p[1]),
+                        backgroundColor: '#D4AF37',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: GleamTheme.current.border } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // ===== Status Distribution (doughnut) =====
+            const statusCounts = {};
+            orders?.forEach(o => {
+                statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
+            });
+            GleamTheme.doughnutChart('statusDistribution', 
+                ['Pending', 'Dibayar', 'Diproses', 'Dikirim', 'Selesai'],
+                [
+                    statusCounts.pending || 0,
+                    statusCounts.paid || 0,
+                    statusCounts.processing || 0,
+                    statusCounts.shipped || 0,
+                    statusCounts.completed || 0
+                ]
+            );
+
+            // ===== Summary Stats =====
+            const totalRevenue = orders?.reduce((sum, o) => sum + (o.total_price || 0), 0) || 0;
+            const totalOrders = orders?.length || 0;
+            const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            const conversionRate = custCount > 0 ? Math.round((totalOrders / custCount) * 100) : 0;
+
+            document.getElementById('avgOrder').textContent = GleamTheme.formatPrice(avgOrder);
+            document.getElementById('totalCust').textContent = (custCount || 0).toLocaleString('id-ID');
+            document.getElementById('convRate').textContent = conversionRate + '%';
+
+            const dailyValues = Object.values(daily);
+            const maxRevenue = Math.max(...dailyValues);
+            const bestDayIndex = dailyValues.indexOf(maxRevenue);
+            document.getElementById('bestDay').textContent = (maxRevenue > 0 ? labels[bestDayIndex] : '-') || '-';
         }
     </script>
 </body>

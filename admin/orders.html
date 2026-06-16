@@ -25,15 +25,76 @@
         </div>
     </main>
     <script>
-        const supabaseClient=window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
-        let currentFilter='all';
-        document.addEventListener('DOMContentLoaded',async()=>{
-            document.getElementById('sidebar-container').innerHTML=GleamTheme.renderSidebar('orders');
-            GleamTheme.init();await GleamTheme.checkAuth();loadOrders();
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('orders');
+            GleamTheme.init();
+            await GleamTheme.checkAuth();
+            await loadOrders();
         });
-        async function loadOrders(){let q=supabaseClient.from('orders').select('*,profiles(full_name)').order('created_at',{ascending:false});if(currentFilter!=='all')q=q.eq('status',currentFilter);const{data}=await q;document.getElementById('ordersTable').innerHTML=data?.map(o=>`<tr class="border-b" style="border-color:var(--border)"><td class="p-4 font-mono text-sm" style="color:var(--gold)">#${o.order_number||o.id.substring(0,8)}</td><td class="p-4 text-sm" style="color:var(--text)">${o.profiles?.full_name||'-'}</td><td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(o.total_price)}</td><td class="p-4">${GleamTheme.statusBadge(o.status)}</td><td class="p-4 text-sm" style="color:var(--text-secondary)">${GleamTheme.formatDate(o.created_at)}</td><td class="p-4"><select onchange="updateStatus('${o.id}',this.value)" class="text-xs rounded-lg px-2 py-1" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)"><option value="">Ubah</option><option value="paid">Dibayar</option><option value="processing">Diproses</option><option value="shipped">Dikirim</option><option value="completed">Selesai</option></select></td></tr>`).join('')||'<tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada pesanan</td></tr>'}
-        function filterOrders(s){currentFilter=s;document.querySelectorAll('#statusTabs button').forEach(b=>{b.style.background='var(--card-bg)';b.style.color='var(--text)';b.style.border='1px solid var(--border)'});const btn=document.querySelector(`[onclick="filterOrders('${s}')"]`);if(btn){btn.style.background='var(--gold)';btn.style.color='white';btn.style.border='none'}loadOrders()}
-        async function updateStatus(id,s){if(!s)return;await supabaseClient.from('orders').update({status:s,updated_at:new Date()}).eq('id',id);loadOrders()}
+
+        async function loadOrders(){
+            let q = supabaseClient
+                .from('orders')
+                .select('*, profiles(full_name, email), order_items(id)')
+                .order('created_at', { ascending: false });
+
+            if (currentFilter !== 'all') q = q.eq('status', currentFilter);
+
+            const { data } = await q;
+
+            document.getElementById('ordersTable').innerHTML = (data?.map(o => {
+                const itemsCount = (o.order_items && Array.isArray(o.order_items)) ? o.order_items.length : 0;
+                const orderNum = o.order_number || (o.id ? o.id.substring(0,8) : '-');
+                const customerName = o.profiles?.full_name || '-';
+                const customerEmail = o.profiles?.email || '';
+                return `
+                    <tr class="border-b" style="border-color:var(--border)">
+                        <td class="p-4 font-mono text-sm" style="color:var(--gold)">#${orderNum}</td>
+                        <td class="p-4 text-sm">
+                            <div style="color:var(--text)">${customerName}</div>
+                            <div class="text-xs" style="color:var(--text-secondary)">Items: ${itemsCount} ${customerEmail? '• ' + customerEmail : ''}</div>
+                        </td>
+                        <td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(o.total_price)}</td>
+                        <td class="p-4">${GleamTheme.statusBadge(o.status)}</td>
+                        <td class="p-4 text-sm" style="color:var(--text-secondary)">${GleamTheme.formatDate(o.created_at)}</td>
+                        <td class="p-4">
+                            <select onchange="updateStatus('${o.id}', this.value)" class="text-xs rounded-lg px-2 py-1" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)">
+                                <option value="">Ubah</option>
+                                <option value="paid">Dibayar</option>
+                                <option value="processing">Diproses</option>
+                                <option value="shipped">Dikirim</option>
+                                <option value="completed">Selesai</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }) || []).join('') || '<tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada pesanan</td></tr>';
+        }
+
+        function filterOrders(s){
+            currentFilter = s;
+            document.querySelectorAll('#statusTabs button').forEach(b => {
+                b.style.background = 'var(--card-bg)';
+                b.style.color = 'var(--text)';
+                b.style.border = '1px solid var(--border)';
+            });
+            const btn = document.querySelector(`[onclick="filterOrders('${s}')"]`);
+            if (btn) {
+                btn.style.background = 'var(--gold)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+            }
+            loadOrders();
+        }
+
+        async function updateStatus(id, s){
+            if(!s) return;
+            await supabaseClient.from('orders').update({ status: s, updated_at: new Date() }).eq('id', id);
+            await loadOrders();
+        }
     </script>
 </body>
 </html>

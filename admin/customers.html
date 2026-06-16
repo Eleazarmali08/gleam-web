@@ -13,18 +13,71 @@
     <div id="sidebar-container"></div>
     <main class="flex-1 p-8">
         <header class="mb-8 fade-in"><h1 class="text-3xl font-extrabold" style="color:var(--text)">Pelanggan</h1><p style="color:var(--text-secondary)" class="mt-1 text-sm">Data semua pelanggan</p></header>
-        <div class="glass-card p-4 mb-6 fade-in"><input type="text" id="searchCustomer" placeholder="🔍 Cari pelanggan..." class="w-full max-w-md px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)" oninput="loadCustomers()"></div>
+        <div class="glass-card p-4 mb-6 fade-in"><input type="text" id="searchCustomer" placeholder="Cari pelanggan..." class="w-full max-w-md px-4 py-2 rounded-xl text-sm" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border)" oninput="loadCustomers()"></div>
         <div class="glass-card overflow-hidden fade-in">
             <table class="w-full text-left"><thead><tr class="text-sm border-b" style="background:var(--input-bg);border-color:var(--border)"><th class="p-4">Pelanggan</th><th class="p-4">Kontak</th><th class="p-4">Pesanan</th><th class="p-4">Total Belanja</th><th class="p-4">Bergabung</th></tr></thead><tbody id="customersTable"><tr><td colspan="5" class="p-8 text-center" style="color:var(--text-secondary)">Loading...</td></tr></tbody></table>
         </div>
     </main>
     <script>
-        const supabaseClient=window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
-        document.addEventListener('DOMContentLoaded',async()=>{
-            document.getElementById('sidebar-container').innerHTML=GleamTheme.renderSidebar('customers');
-            GleamTheme.init();await GleamTheme.checkAuth();loadCustomers();
+        const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('customers');
+            GleamTheme.init();
+            await GleamTheme.checkAuth();
+            await loadCustomers();
         });
-        async function loadCustomers(){const s=document.getElementById('searchCustomer').value;let q=supabaseClient.from('profiles').select('*').eq('role','customer').order('created_at',{ascending:false});if(s)q=q.or(`full_name.ilike.%${s}%,email.ilike.%${s}%`);const{data}=await q;const rows=await Promise.all(data?.map(async c=>{const{data:orders}=await supabaseClient.from('orders').select('total_price').eq('user_id',c.id);const total=orders?.reduce((a,o)=>a+(o.total_price||0),0)||0;return`<tr class="border-b" style="border-color:var(--border)"><td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background:var(--gold)">${c.full_name?.[0]?.toUpperCase()||'?'}</div><div class="font-medium" style="color:var(--text)">${c.full_name||'-'}</div></div></td><td class="p-4 text-sm"><div style="color:var(--text)">${c.email||'-'}</div><div style="color:var(--text-secondary)">${c.phone||'-'}</div></td><td class="p-4 text-sm font-medium" style="color:var(--text)">${orders?.length||0}</td><td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(total)}</td><td class="p-4 text-sm" style="color:var(--text-secondary)">${GleamTheme.formatDate(c.created_at)}</td></tr>`})||[]);document.getElementById('customersTable').innerHTML=rows.join('')||'<tr><td colspan="5" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada pelanggan</td></tr>'}
+
+        async function loadCustomers(){
+            const searchVal = document.getElementById('searchCustomer').value;
+            let query = supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('role', 'customer')
+                .order('created_at', { ascending: false });
+
+            if (searchVal) {
+                query = query.or(`full_name.ilike.%${searchVal}%,email.ilike.%${searchVal}%`);
+            }
+
+            const { data: customers } = await query;
+
+            const rows = await Promise.all(
+                (customers || []).map(async (customer) => {
+                    const { data: orders } = await supabaseClient
+                        .from('orders')
+                        .select('total_price')
+                        .eq('user_id', customer.id);
+
+                    const totalSpent = (orders || []).reduce((sum, order) => sum + (Number(order.total_price) || 0), 0);
+                    const ordersCount = orders?.length || 0;
+                    const initials = (customer.full_name || '?')[0].toUpperCase();
+
+                    return `
+                        <tr class="border-b" style="border-color:var(--border)">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background:var(--gold)">
+                                        ${initials}
+                                    </div>
+                                    <div class="font-medium" style="color:var(--text)">${customer.full_name || '-'}</div>
+                                </div>
+                            </td>
+                            <td class="p-4 text-sm">
+                                <div style="color:var(--text)">${customer.email || '-'}</div>
+                                <div style="color:var(--text-secondary)">${customer.phone || '-'}</div>
+                            </td>
+                            <td class="p-4 text-sm font-medium" style="color:var(--text)">${ordersCount}</td>
+                            <td class="p-4 text-sm font-medium" style="color:var(--text)">${GleamTheme.formatPrice(totalSpent)}</td>
+                            <td class="p-4 text-sm" style="color:var(--text-secondary)">${GleamTheme.formatDate(customer.created_at)}</td>
+                        </tr>
+                    `;
+                })
+            );
+
+            document.getElementById('customersTable').innerHTML = rows.join('')
+                || '<tr><td colspan="5" class="p-8 text-center" style="color:var(--text-secondary)">Tidak ada pelanggan</td></tr>';
+        }
     </script>
 </body>
 </html>
