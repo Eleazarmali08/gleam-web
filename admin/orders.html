@@ -20,8 +20,8 @@
             <button onclick="filterOrders('processing')" class="px-4 py-2 rounded-xl font-medium text-sm" style="background:var(--card-bg);color:var(--text);border:1px solid var(--border)">Diproses</button>
             <button onclick="filterOrders('completed')" class="px-4 py-2 rounded-xl font-medium text-sm" style="background:var(--card-bg);color:var(--text);border:1px solid var(--border)">Selesai</button>
         </div>
-        <div class="glass-card overflow-hidden fade-in">
-            <table class="w-full text-left"><thead><tr class="text-sm border-b" style="background:var(--input-bg);border-color:var(--border)"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Total</th><th class="p-4">Status</th><th class="p-4">Tanggal</th><th class="p-4">Aksi</th></tr></thead><tbody id="ordersTable"><tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Loading...</td></tr></tbody></table>
+        <div class="glass-card overflow-x-auto fade-in">
+            <table class="w-full text-left text-sm"><thead><tr class="text-xs border-b" style="background:var(--input-bg);border-color:var(--border)"><th class="p-4 whitespace-nowrap">Order ID</th><th class="p-4 whitespace-nowrap">Customer</th><th class="p-4 whitespace-nowrap">Total</th><th class="p-4 whitespace-nowrap">Status</th><th class="p-4 whitespace-nowrap">Tanggal</th><th class="p-4 whitespace-nowrap">Aksi</th></tr></thead><tbody id="ordersTable"><tr><td colspan="6" class="p-8 text-center" style="color:var(--text-secondary)">Loading...</td></tr></tbody></table>
         </div>
     </main>
     <script>

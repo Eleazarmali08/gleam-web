@@ -35,11 +35,16 @@
         // Local bar chart instance
         let topProductsChart = null;
 
+        let analyticsLoaded = false;
+
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('analytics');
             GleamTheme.init();
             await GleamTheme.checkAuth();
-            await loadAnalytics();
+            if (!analyticsLoaded) {
+                analyticsLoaded = true;
+                await loadAnalytics();
+            }
         });
 
         async function loadAnalytics(){

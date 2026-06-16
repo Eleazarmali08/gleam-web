@@ -204,10 +204,21 @@ const GleamTheme = {
             table td {
                 color: var(--text);
                 border-bottom: 1px solid var(--border);
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
 
             table tr:hover td {
                 background: var(--hover-bg);
+            }
+
+            table {
+                border-collapse: collapse;
+            }
+
+            .glass-card.overflow-x-auto {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
         `;
         document.head.appendChild(style);
@@ -220,7 +231,11 @@ const GleamTheme = {
         if (typeof Chart === 'undefined') return;
         Chart.defaults.color = this.current.textSecondary;
         Chart.defaults.borderColor = this.current.border;
-        Object.values(Chart.instances).forEach(c => c.update());
+        if (this.chartInstances) {
+            Object.values(this.chartInstances).forEach(c => {
+                if (c && typeof c.update === 'function') c.update();
+            });
+        }
     },
 
     lineChart(canvasId, labels, data) {
