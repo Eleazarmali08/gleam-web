@@ -145,19 +145,27 @@
             document.getElementById('pendingOrders').textContent = pendingCount.toLocaleString('id-ID');
 
             const { labels, data } = getLast7DaysRevenue(safeOrders);
-            GleamTheme.lineChart('revenueChart', labels, data);
 
-            const statusCounts = safeOrders.reduce((acc, order) => {
-                acc[order.status] = (acc[order.status] || 0) + 1;
-                return acc;
-            }, {});
+            // Wrap chart creation in setTimeout to ensure DOM is ready
+            setTimeout(() => {
+                if (document.getElementById('revenueChart')) {
+                    GleamTheme.lineChart('revenueChart', labels, data);
+                }
 
-            GleamTheme.doughnutChart('orderStatusChart', ['Pending', 'Dibayar', 'Diproses', 'Selesai'], [
-                statusCounts.pending || 0,
-                statusCounts.paid || 0,
-                statusCounts.processing || 0,
-                statusCounts.completed || 0,
-            ]);
+                if (document.getElementById('orderStatusChart')) {
+                    const statusCounts = safeOrders.reduce((acc, order) => {
+                        acc[order.status] = (acc[order.status] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    GleamTheme.doughnutChart('orderStatusChart', ['Pending', 'Dibayar', 'Diproses', 'Selesai'], [
+                        statusCounts.pending || 0,
+                        statusCounts.paid || 0,
+                        statusCounts.processing || 0,
+                        statusCounts.completed || 0,
+                    ]);
+                }
+            }, 500);
 
             const recentOrders = safeOrders.slice(0, 5);
             document.getElementById('recentOrders').innerHTML = recentOrders.map(order => `

@@ -5,6 +5,7 @@
 const GleamTheme = {
     // Default: White Gold (light)
     isDark: localStorage.getItem('gleam-theme') === 'dark',
+    chartInstances: {},
 
     // ============================================
     // COLORS
@@ -241,16 +242,13 @@ const GleamTheme = {
     lineChart(canvasId, labels, data) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return null;
-        
+
+        this.destroyChart(canvasId);
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
+
         const ctx = canvas.getContext('2d');
-        
-        // Destroy old chart if exists
-        if (this.chartInstances && this.chartInstances[canvasId]) {
-            this.chartInstances[canvasId].destroy();
-        }
-        
-        if (!this.chartInstances) this.chartInstances = {};
-        
+
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -269,10 +267,10 @@ const GleamTheme = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 800 },
+                animation: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { 
+                    y: {
                         grid: { color: this.current.border },
                         beginAtZero: true
                     },
@@ -280,7 +278,7 @@ const GleamTheme = {
                 }
             }
         });
-        
+
         this.chartInstances[canvasId] = chart;
         return chart;
     },
@@ -288,16 +286,13 @@ const GleamTheme = {
     doughnutChart(canvasId, labels, data) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return null;
-        
+
+        this.destroyChart(canvasId);
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
+
         const ctx = canvas.getContext('2d');
-        
-        // Destroy old chart if exists
-        if (this.chartInstances && this.chartInstances[canvasId]) {
-            this.chartInstances[canvasId].destroy();
-        }
-        
-        if (!this.chartInstances) this.chartInstances = {};
-        
+
         const chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -311,31 +306,50 @@ const GleamTheme = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 800 },
+                animation: false,
                 plugins: {
-                    legend: { 
-                        position: 'right', 
-                        labels: { 
-                            boxWidth: 12, 
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
                             padding: 15,
                             color: this.current.textSecondary
-                        } 
+                        }
                     }
                 }
             }
         });
-        
+
         this.chartInstances[canvasId] = chart;
         return chart;
     },
 
+    destroyChart(canvasId) {
+        if (this.chartInstances && this.chartInstances[canvasId]) {
+            if (typeof this.chartInstances[canvasId].destroy === 'function') {
+                this.chartInstances[canvasId].destroy();
+            }
+            delete this.chartInstances[canvasId];
+        }
+        const canvas = document.getElementById(canvasId);
+        if (canvas) {
+            const existing = Chart.getChart(canvas);
+            if (existing) existing.destroy();
+        }
+    },
+
     destroyCharts() {
         if (this.chartInstances) {
-            Object.values(this.chartInstances).forEach(c => {
-                if (c && typeof c.destroy === 'function') c.destroy();
+            Object.entries(this.chartInstances).forEach(([id, chart]) => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
             });
             this.chartInstances = {};
         }
+        Chart.helpers.each(Chart.instances, instance => {
+            if (instance) instance.destroy();
+        });
     },
 
     // ============================================
