@@ -325,16 +325,19 @@ const GleamTheme = {
                         ticks: { 
                             color: this.current.textSecondary || '#999',
                             font: { size: 10 },
-                            callback: (value) => {
+                            // ✅ Pastikan callback tidak error
+                            callback: function(value) {
                                 if (value >= 1000000) return 'Rp ' + (value / 1000000).toFixed(0) + 'M';
-                                if (value >= 1000) return 'Rp ' + (value / 1000).toFixed(0) + 'K';
-                                return 'Rp ' + value;
+                                return 'Rp ' + value.toLocaleString('id-ID');
                             }
                         }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: this.current.textSecondary || '#999', font: { size: 10 } }
+                        ticks: { 
+                            color: this.current.textSecondary || '#999',
+                            font: { size: 10 }
+                        }
                     }
                 }
             }
