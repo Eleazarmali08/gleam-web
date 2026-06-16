@@ -32,6 +32,9 @@
     <script>
         const supabaseClient = window.supabase.createClient('https://ztrdiuvfczylzqsrrkhe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cmRpdXZmY3p5bHpxc3Jya2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MjU4OTQsImV4cCI6MjA5MzUwMTg5NH0.0roGvDQaWONGkPV1s-uRen2seoLdXkckHq03F6cQTyw');
 
+        // Local bar chart instance
+        let topProductsChart = null;
+
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('sidebar-container').innerHTML = GleamTheme.renderSidebar('analytics');
             GleamTheme.init();
@@ -40,16 +43,18 @@
         });
 
         async function loadAnalytics(){
+            // Destroy all existing charts before loading new data
+            GleamTheme.destroyCharts();
+            if (topProductsChart) {
+                topProductsChart.destroy();
+                topProductsChart = null;
+            }
+
             // Fetch orders with order items
             const { data: orders } = await supabaseClient
                 .from('orders')
                 .select('*, order_items(*)')
                 .order('created_at', { ascending: true });
-
-            // Fetch products with categories
-            const { data: products } = await supabaseClient
-                .from('products')
-                .select('*, categories(name)');
 
             // Get customer count
             const { count: custCount } = await supabaseClient
@@ -85,28 +90,32 @@
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 5);
 
-            new Chart(document.getElementById('topProducts'), {
-                type: 'bar',
-                data: {
-                    labels: topProducts.map(p => p[0].substring(0, 20)),
-                    datasets: [{
-                        label: 'Terjual',
-                        data: topProducts.map(p => p[1]),
-                        backgroundColor: '#D4AF37',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: GleamTheme.current.border } },
-                        y: { grid: { display: false } }
+            const topProductsCanvas = document.getElementById('topProducts');
+            if (topProductsCanvas) {
+                topProductsChart = new Chart(topProductsCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: topProducts.map(p => p[0].substring(0, 20)),
+                        datasets: [{
+                            label: 'Terjual',
+                            data: topProducts.map(p => p[1]),
+                            backgroundColor: '#D4AF37',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 800 },
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: GleamTheme.current.border } },
+                            y: { grid: { display: false } }
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // ===== Status Distribution (doughnut) =====
             const statusCounts = {};

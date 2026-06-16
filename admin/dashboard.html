@@ -16,6 +16,24 @@
                 }
             }
         }
+        // Di dashboard.html & analytics.html, tambahkan di awal script:
+        let chartInstances = {};
+
+        function destroyChart(key) {
+            if (chartInstances[key]) {
+                chartInstances[key].destroy();
+                delete chartInstances[key];
+            }
+        }
+
+        function destroyAllCharts() {
+            Object.keys(chartInstances).forEach(key => {
+                if (chartInstances[key]) {
+                    chartInstances[key].destroy();
+                }
+            });
+            chartInstances = {};
+        }        
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -98,6 +116,9 @@
         });
 
         async function loadDashboard(){
+            // Destroy all existing charts before loading new data
+            GleamTheme.destroyCharts();
+
             const { data: orders, error: ordersError } = await supabaseClient
                 .from('orders')
                 .select('*, profiles(full_name,email)')

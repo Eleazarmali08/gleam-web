@@ -224,9 +224,19 @@ const GleamTheme = {
     },
 
     lineChart(canvasId, labels, data) {
-        const ctx = document.getElementById(canvasId)?.getContext('2d');
-        if (!ctx) return null;
-        return new Chart(ctx, {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Destroy old chart if exists
+        if (this.chartInstances && this.chartInstances[canvasId]) {
+            this.chartInstances[canvasId].destroy();
+        }
+        
+        if (!this.chartInstances) this.chartInstances = {};
+        
+        const chart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels,
@@ -244,19 +254,36 @@ const GleamTheme = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 800 },
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { grid: { color: this.current.border } },
+                    y: { 
+                        grid: { color: this.current.border },
+                        beginAtZero: true
+                    },
                     x: { grid: { display: false } }
                 }
             }
         });
+        
+        this.chartInstances[canvasId] = chart;
+        return chart;
     },
 
     doughnutChart(canvasId, labels, data) {
-        const ctx = document.getElementById(canvasId)?.getContext('2d');
-        if (!ctx) return null;
-        return new Chart(ctx, {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Destroy old chart if exists
+        if (this.chartInstances && this.chartInstances[canvasId]) {
+            this.chartInstances[canvasId].destroy();
+        }
+        
+        if (!this.chartInstances) this.chartInstances = {};
+        
+        const chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels,
@@ -269,11 +296,31 @@ const GleamTheme = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 800 },
                 plugins: {
-                    legend: { position: 'right', labels: { boxWidth: 12, padding: 15 } }
+                    legend: { 
+                        position: 'right', 
+                        labels: { 
+                            boxWidth: 12, 
+                            padding: 15,
+                            color: this.current.textSecondary
+                        } 
+                    }
                 }
             }
         });
+        
+        this.chartInstances[canvasId] = chart;
+        return chart;
+    },
+
+    destroyCharts() {
+        if (this.chartInstances) {
+            Object.values(this.chartInstances).forEach(c => {
+                if (c && typeof c.destroy === 'function') c.destroy();
+            });
+            this.chartInstances = {};
+        }
     },
 
     // ============================================
