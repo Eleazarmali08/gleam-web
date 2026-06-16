@@ -1,5 +1,5 @@
 // ============================================
-// GLEAM THEME SERVICE - WHITE GOLD + DARK MODE
+// GLEAM THEME SERVICE - COMPLETE
 // ============================================
 
 const GleamTheme = {
@@ -41,6 +41,21 @@ const GleamTheme = {
 
     get current() {
         return this.colors[this.isDark ? 'dark' : 'light'];
+    },
+
+    // ============================================
+    // CHART COLORS
+    // ============================================
+    chartColors: {
+        gold: '#D4AF37',
+        goldDark: '#B8960C',
+        goldLight: '#F4E4C1',
+        blue: '#3B82F6',
+        purple: '#8B5CF6',
+        green: '#10B981',
+        red: '#EF4444',
+        orange: '#F59E0B',
+        teal: '#14B8A6',
     },
 
     // ============================================
@@ -216,11 +231,6 @@ const GleamTheme = {
             table {
                 border-collapse: collapse;
             }
-
-            .glass-card.overflow-x-auto {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
         `;
         document.head.appendChild(style);
     },
@@ -228,104 +238,15 @@ const GleamTheme = {
     // ============================================
     // CHART HELPERS
     // ============================================
-    updateCharts() {
-        if (typeof Chart === 'undefined') return;
-        Chart.defaults.color = this.current.textSecondary;
-        Chart.defaults.borderColor = this.current.border;
-        if (this.chartInstances) {
-            Object.values(this.chartInstances).forEach(c => {
-                if (c && typeof c.update === 'function') c.update();
-            });
-        }
-    },
-
-    lineChart(canvasId, labels, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
-
-        this.destroyChart(canvasId);
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        const ctx = canvas.getContext('2d');
-
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Revenue',
-                    data,
-                    borderColor: '#D4AF37',
-                    backgroundColor: 'rgba(212,175,55,0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointBackgroundColor: '#D4AF37',
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        grid: { color: this.current.border },
-                        beginAtZero: true
-                    },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        this.chartInstances[canvasId] = chart;
-        return chart;
-    },
-
-    doughnutChart(canvasId, labels, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
-
-        this.destroyChart(canvasId);
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        const ctx = canvas.getContext('2d');
-
-        const chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: ['#FBBF24', '#3B82F6', '#8B5CF6', '#10B981', '#EF4444'],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 15,
-                            color: this.current.textSecondary
-                        }
-                    }
-                }
-            }
-        });
-
-        this.chartInstances[canvasId] = chart;
-        return chart;
+    hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     },
 
     destroyChart(canvasId) {
-        if (this.chartInstances && this.chartInstances[canvasId]) {
+        if (this.chartInstances[canvasId]) {
             if (typeof this.chartInstances[canvasId].destroy === 'function') {
                 this.chartInstances[canvasId].destroy();
             }
@@ -338,19 +259,213 @@ const GleamTheme = {
         }
     },
 
-    destroyCharts() {
+    destroyAllCharts() {
         if (this.chartInstances) {
-            Object.entries(this.chartInstances).forEach(([id, chart]) => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
+            Object.keys(this.chartInstances).forEach(key => {
+                if (this.chartInstances[key] && typeof this.chartInstances[key].destroy === 'function') {
+                    this.chartInstances[key].destroy();
                 }
             });
             this.chartInstances = {};
         }
-        // Clean up any orphaned Chart.js instances
         if (typeof Chart !== 'undefined' && Chart.instances) {
-            Object.values(Chart.instances).forEach(instance => {
-                if (instance) instance.destroy();
+            Object.values(Chart.instances).forEach(c => {
+                if (c && c.destroy) c.destroy();
+            });
+        }
+    },
+
+    lineChart(canvasId, labels, data, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+
+        this.destroyChart(canvasId);
+
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels || [],
+                datasets: [{
+                    label: options.label || 'Revenue',
+                    data: data || [],
+                    borderColor: options.borderColor || this.chartColors.gold,
+                    backgroundColor: options.backgroundColor || this.hexToRgba(this.chartColors.gold, 0.1),
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: options.pointColor || this.chartColors.gold,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: { display: options.showLegend || false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => 'Rp ' + (ctx.parsed?.y || 0).toLocaleString('id-ID')
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: this.current.border },
+                        ticks: { color: this.current.textSecondary, font: { size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: this.current.textSecondary, font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        this.chartInstances[canvasId] = chart;
+        return chart;
+    },
+
+    doughnutChart(canvasId, labels, data, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+
+        this.destroyChart(canvasId);
+
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels || [],
+                datasets: [{
+                    data: data || [],
+                    backgroundColor: options.colors || [
+                        this.chartColors.orange,
+                        this.chartColors.blue,
+                        this.chartColors.purple,
+                        this.chartColors.green,
+                        this.chartColors.red,
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'transparent',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: {
+                        position: options.legendPosition || 'right',
+                        labels: {
+                            boxWidth: 10,
+                            padding: 12,
+                            color: this.current.textSecondary,
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+
+        this.chartInstances[canvasId] = chart;
+        return chart;
+    },
+
+    barChart(canvasId, labels, data, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+
+        this.destroyChart(canvasId);
+
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels || [],
+                datasets: [{
+                    label: options.label || 'Total',
+                    data: data || [],
+                    backgroundColor: options.backgroundColor || this.chartColors.gold,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                indexAxis: options.horizontal ? 'y' : 'x',
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { display: options.showLegend || false } },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: this.current.border },
+                        ticks: { color: this.current.textSecondary, font: { size: 10 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: this.current.border },
+                        ticks: { color: this.current.textSecondary, font: { size: 10 }, stepSize: options.stepSize || 1 }
+                    }
+                }
+            }
+        });
+
+        this.chartInstances[canvasId] = chart;
+        return chart;
+    },
+
+    polarChart(canvasId, labels, data) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+
+        this.destroyChart(canvasId);
+
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                labels: labels || [],
+                datasets: [{
+                    data: data || [],
+                    backgroundColor: [
+                        this.hexToRgba(this.chartColors.gold, 0.7),
+                        this.hexToRgba(this.chartColors.goldDark, 0.7),
+                        this.hexToRgba(this.chartColors.goldLight, 0.7),
+                        this.hexToRgba('#E5C100', 0.7),
+                        this.hexToRgba('#C9A800', 0.7),
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, usePointStyle: true, color: this.current.textSecondary }
+                    }
+                }
+            }
+        });
+
+        this.chartInstances[canvasId] = chart;
+        return chart;
+    },
+
+    updateCharts() {
+        if (typeof Chart === 'undefined') return;
+        Chart.defaults.color = this.current.textSecondary;
+        Chart.defaults.borderColor = this.current.border;
+        if (this.chartInstances) {
+            Object.values(this.chartInstances).forEach(c => {
+                if (c && typeof c.update === 'function') c.update();
             });
         }
     },
@@ -438,5 +553,3 @@ const GleamTheme = {
         window.location.href = 'login.html';
     }
 };
-
-// NOTE: Do NOT auto-init here. Each page calls GleamTheme.init() in its own DOMContentLoaded handler.
