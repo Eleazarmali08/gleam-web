@@ -44,75 +44,66 @@
 
         async function loadAnalytics(){
             // Destroy all existing charts before loading new data
-            GleamTheme.destroyCharts();
+            GleamTheme.destroyAllCharts();
             if (topProductsChart) {
                 topProductsChart.destroy();
                 topProductsChart = null;
             }
 
-            // Fetch orders with order items
-            const { data: orders } = await supabaseClient
-                .from('orders')
-                .select('*, order_items(*)')
-                .order('created_at', { ascending: true });
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const token = session?.access_token;
 
-            // Get customer count
-            const { count: custCount } = await supabaseClient
-                .from('profiles')
-                .select('*', { count: 'exact', head: true })
-                .eq('role', 'customer');
+            let stats = {};
+            try {
+                const res = await fetch('../api/dashboard.php?period=7', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                stats = await res.json();
+            } catch (err) {
+                console.error('Failed to load analytics from API:', err);
+            }
 
             // ===== Revenue Trend (7 days) =====
-            const daily = {};
+            const daily = stats.daily_revenue || {};
             const labels = [];
+            const data = [];
             for (let i = 6; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
-                const key = d.toISOString().split('T')[0];
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const key = `${y}-${m}-${day}`;
                 labels.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
-                daily[key] = 0;
+                data.push(daily[key] || 0);
             }
-            orders?.forEach(o => {
-                const ds = new Date(o.created_at).toISOString().split('T')[0];
-                if (daily.hasOwnProperty(ds)) daily[ds] += (o.total_price || 0);
-            });
 
             // ===== Top Products (horizontal bar) =====
-            const productSales = {};
-            orders?.forEach(o => {
-                o.order_items?.forEach(item => {
-                    const pname = item.product_name || 'Unknown';
-                    productSales[pname] = (productSales[pname] || 0) + (item.quantity || 0);
-                });
-            });
+            const productSales = stats.top_products || {};
             const topProducts = Object.entries(productSales)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 5);
 
             // ===== Status Distribution (doughnut) =====
-            const statusCounts = {};
-            orders?.forEach(o => {
-                statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
-            });
+            const statusCounts = stats.status_counts || {};
 
             // ===== Summary Stats =====
-            const totalRevenue = orders?.reduce((sum, o) => sum + (o.total_price || 0), 0) || 0;
-            const totalOrders = orders?.length || 0;
-            const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            const avgOrder = stats.avg_order_value || 0;
+            const custCount = stats.total_customers || 0;
+            const totalOrders = stats.total_orders || 0;
             const conversionRate = custCount > 0 ? Math.round((totalOrders / custCount) * 100) : 0;
 
             document.getElementById('avgOrder').textContent = GleamTheme.formatPrice(avgOrder);
-            document.getElementById('totalCust').textContent = (custCount || 0).toLocaleString('id-ID');
+            document.getElementById('totalCust').textContent = custCount.toLocaleString('id-ID');
             document.getElementById('convRate').textContent = conversionRate + '%';
 
-            const dailyValues = Object.values(daily);
-            const maxRevenue = Math.max(...dailyValues);
-            const bestDayIndex = dailyValues.indexOf(maxRevenue);
+            const maxRevenue = Math.max(...data);
+            const bestDayIndex = data.indexOf(maxRevenue);
             document.getElementById('bestDay').textContent = (maxRevenue > 0 ? labels[bestDayIndex] : '-') || '-';
 
             // Charts render directly — DOM is already ready inside DOMContentLoaded
             if (document.getElementById('revenueTrend')) {
-                GleamTheme.lineChart('revenueTrend', labels, Object.values(daily));
+                GleamTheme.lineChart('revenueTrend', labels, data);
             }
 
             if (document.getElementById('topProducts')) {

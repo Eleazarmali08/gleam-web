@@ -16,40 +16,6 @@
                 }
             }
         };
-        async function loadDashboard() {
-    GleamTheme.destroyAllCharts(); // ✅ Hancurkan semua dulu
-
-    const { data: orders } = await supabaseClient
-        .from('orders')
-        .select('*, profiles(full_name)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-    console.log('📦 Orders loaded:', orders?.length); // DEBUG
-
-    // ... update stats ...
-
-    const { labels, data } = getLast7DaysRevenue(orders || []);
-    console.log('📊 Revenue data:', { labels, data }); // DEBUG
-
-    // ✅ Delay untuk pastikan DOM ready
-    setTimeout(() => {
-        if (document.getElementById('revenueChart')) {
-            console.log('📊 Creating revenue chart...'); // DEBUG
-            GleamTheme.lineChart('revenueChart', labels, data);
-        }
-        
-        if (document.getElementById('orderStatusChart')) {
-            console.log('📊 Creating status chart...'); // DEBUG
-            const sc = {};
-            orders?.forEach(o => { sc[o.status] = (sc[o.status] || 0) + 1; });
-            GleamTheme.doughnutChart('orderStatusChart', 
-                ['Pending', 'Dibayar', 'Diproses', 'Selesai'],
-                [sc.pending || 0, sc.paid || 0, sc.processing || 0, sc.completed || 0]
-            );
-        }
-    }, 500);
-}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -133,34 +99,52 @@
 
         async function loadDashboard(){
             // Destroy all existing charts before loading new data
-            GleamTheme.destroyCharts();
+            GleamTheme.destroyAllCharts();
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const token = session?.access_token;
+
+            let stats = {};
+            try {
+                const res = await fetch('../api/dashboard.php?period=7', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                stats = await res.json();
+            } catch (err) {
+                console.error('Failed to load stats from API:', err);
+            }
 
             const { data: orders, error: ordersError } = await supabaseClient
                 .from('orders')
                 .select('*, profiles(full_name,email)')
                 .order('created_at', { ascending: false })
-                .limit(50);
+                .limit(5);
 
             if (ordersError) {
                 console.error('Failed to load orders:', ordersError);
             }
 
-            const { count: productCount } = await supabaseClient
-                .from('products')
-                .select('id', { count: 'exact', head: true })
-                .eq('is_active', true);
-
             const safeOrders = Array.isArray(orders) ? orders : [];
-            const totalRevenue = safeOrders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0);
-            const pendingCount = safeOrders.filter(order => order.status === 'pending').length;
-            const totalOrders = safeOrders.length;
 
-            document.getElementById('totalRevenue').textContent = GleamTheme.formatPrice(totalRevenue);
-            document.getElementById('totalOrders').textContent = totalOrders.toLocaleString('id-ID');
-            document.getElementById('totalProducts').textContent = (productCount || 0).toLocaleString('id-ID');
-            document.getElementById('pendingOrders').textContent = pendingCount.toLocaleString('id-ID');
+            document.getElementById('totalRevenue').textContent = GleamTheme.formatPrice(stats.total_revenue || 0);
+            document.getElementById('totalOrders').textContent = (stats.total_orders || 0).toLocaleString('id-ID');
+            document.getElementById('totalProducts').textContent = (stats.total_products || 0).toLocaleString('id-ID');
+            document.getElementById('pendingOrders').textContent = (stats.pending_count || 0).toLocaleString('id-ID');
 
-            const { labels, data } = getLast7DaysRevenue(safeOrders);
+            const revenueByDay = stats.daily_revenue || {};
+            const labels = [];
+            const data = [];
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                const key = `${y}-${m}-${d}`;
+                labels.push(date.toLocaleDateString('id-ID', { weekday: 'short' }));
+                data.push(revenueByDay[key] || 0);
+            }
 
             // Charts render directly — DOM is already ready inside DOMContentLoaded
             if (document.getElementById('revenueChart')) {
@@ -168,21 +152,16 @@
             }
 
             if (document.getElementById('orderStatusChart')) {
-                const statusCounts = safeOrders.reduce((acc, order) => {
-                    acc[order.status] = (acc[order.status] || 0) + 1;
-                    return acc;
-                }, {});
-
+                const sc = stats.status_counts || {};
                 GleamTheme.doughnutChart('orderStatusChart', ['Pending', 'Dibayar', 'Diproses', 'Selesai'], [
-                    statusCounts.pending || 0,
-                    statusCounts.paid || 0,
-                    statusCounts.processing || 0,
-                    statusCounts.completed || 0,
+                    sc.pending || 0,
+                    sc.paid || 0,
+                    sc.processing || 0,
+                    sc.completed || 0,
                 ]);
             }
 
-            const recentOrders = safeOrders.slice(0, 5);
-            document.getElementById('recentOrders').innerHTML = recentOrders.map(order => `
+            document.getElementById('recentOrders').innerHTML = safeOrders.map(order => `
                 <tr class="border-b" style="border-color:var(--border)">
                     <td class="py-3 font-mono text-sm" style="color:var(--gold)">#${order.order_number || (order.id || '').substring(0, 8)}</td>
                     <td class="py-3 text-sm">
@@ -195,31 +174,6 @@
                     <td class="py-3"><a href="orders.html?id=${order.id}" class="text-sm font-medium" style="color:var(--gold)">Detail →</a></td>
                 </tr>
             `).join('') || '<tr><td colspan="6" class="py-8 text-center" style="color:var(--text-secondary)">Belum ada pesanan</td></tr>';
-        }
-
-        function getLast7DaysRevenue(orders){
-            const revenueByDay = {};
-            const labels = [];
-
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const key = date.toISOString().split('T')[0];
-                labels.push(date.toLocaleDateString('id-ID', { weekday: 'short' }));
-                revenueByDay[key] = 0;
-            }
-
-            orders.forEach(order => {
-                const key = new Date(order.created_at).toISOString().split('T')[0];
-                if (revenueByDay.hasOwnProperty(key)) {
-                    revenueByDay[key] += Number(order.total_price) || 0;
-                }
-            });
-
-            return {
-                labels,
-                data: Object.values(revenueByDay),
-            };
         }
     </script>
 </body>
