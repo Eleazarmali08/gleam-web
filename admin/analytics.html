@@ -102,52 +102,80 @@
             document.getElementById('bestDay').textContent = (maxRevenue > 0 ? labels[bestDayIndex] : '-') || '-';
 
             // Charts render directly — DOM is already ready inside DOMContentLoaded
-            if (document.getElementById('revenueTrend')) {
-                GleamTheme.lineChart('revenueTrend', labels, data);
-            }
+            const hasOrders = Number(stats.total_orders) > 0;
+            const hasRevenueData = data.some(v => v > 0);
 
-            if (document.getElementById('topProducts')) {
-                const topProductsCanvas = document.getElementById('topProducts');
-                const existing = Chart.getChart(topProductsCanvas);
-                if (existing) existing.destroy();
-
-                topProductsChart = new Chart(topProductsCanvas, {
-                    type: 'bar',
-                    data: {
-                        labels: topProducts.map(p => p[0].substring(0, 20)),
-                        datasets: [{
-                            label: 'Terjual',
-                            data: topProducts.map(p => p[1]),
-                            backgroundColor: '#D4AF37',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { color: GleamTheme.current.border } },
-                            y: { grid: { display: false } }
-                        }
-                    }
+            if (hasOrders) {
+                // Remove any existing no-data messages and show canvases
+                ['revenueTrend', 'topProducts', 'statusDistribution'].forEach(id => {
+                    const noData = document.getElementById('no-data-' + id);
+                    if (noData) noData.remove();
+                    const canvas = document.getElementById(id);
+                    if (canvas) canvas.style.display = 'block';
                 });
-                GleamTheme.chartInstances['topProducts'] = topProductsChart;
-            }
 
-            if (document.getElementById('statusDistribution')) {
-                GleamTheme.doughnutChart('statusDistribution',
-                    ['Pending', 'Dibayar', 'Diproses', 'Dikirim', 'Selesai'],
-                    [
+                if (document.getElementById('revenueTrend') && hasRevenueData) {
+                    GleamTheme.lineChart('revenueTrend', labels, data);
+                }
+
+                if (document.getElementById('topProducts') && topProducts.length > 0) {
+                    const topProductsCanvas = document.getElementById('topProducts');
+                    const existing = Chart.getChart(topProductsCanvas);
+                    if (existing) existing.destroy();
+
+                    topProductsChart = new Chart(topProductsCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: topProducts.map(p => p[0].substring(0, 20)),
+                            datasets: [{
+                                label: 'Terjual',
+                                data: topProducts.map(p => p[1]),
+                                backgroundColor: '#D4AF37',
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { color: GleamTheme.current.border } },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+                    GleamTheme.chartInstances['topProducts'] = topProductsChart;
+                }
+
+                if (document.getElementById('statusDistribution')) {
+                    const statusData = [
                         statusCounts.pending || 0,
                         statusCounts.paid || 0,
                         statusCounts.processing || 0,
                         statusCounts.shipped || 0,
                         statusCounts.completed || 0
-                    ]
-                );
+                    ];
+                    if (statusData.some(v => v > 0)) {
+                        GleamTheme.doughnutChart('statusDistribution',
+                            ['Pending', 'Dibayar', 'Diproses', 'Dikirim', 'Selesai'],
+                            statusData
+                        );
+                    }
+                }
+            } else {
+                // No data — hide canvases and show messages
+                ['revenueTrend', 'topProducts', 'statusDistribution'].forEach(id => {
+                    const canvas = document.getElementById(id);
+                    if (canvas) {
+                        canvas.style.display = 'none';
+                        const parent = canvas.parentElement;
+                        if (!document.getElementById('no-data-' + id)) {
+                            parent.insertAdjacentHTML('beforeend', '<p id="no-data-' + id + '" class="text-center text-sm py-10" style="color:var(--text-secondary)">Belum ada data untuk ditampilkan</p>');
+                        }
+                    }
+                });
             }
         }
     </script>

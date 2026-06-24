@@ -261,18 +261,20 @@ const GleamTheme = {
 
     destroyAllCharts() {
         if (this.chartInstances) {
-            Object.keys(this.chartInstances).forEach(key => {
-                if (this.chartInstances[key] && typeof this.chartInstances[key].destroy === 'function') {
-                    this.chartInstances[key].destroy();
+            const keys = Object.keys(this.chartInstances);
+            keys.forEach(key => {
+                try {
+                    if (this.chartInstances[key] && typeof this.chartInstances[key].destroy === 'function') {
+                        this.chartInstances[key].destroy();
+                    }
+                } catch (e) {
+                    console.warn('Chart destroy error for', key, e);
                 }
             });
             this.chartInstances = {};
         }
-        if (typeof Chart !== 'undefined' && Chart.instances) {
-            Object.values(Chart.instances).forEach(c => {
-                if (c && c.destroy) c.destroy();
-            });
-        }
+        // Do NOT iterate Chart.instances — it's a live registry and
+        // modifying it during iteration causes infinite loops.
     },
 
     lineChart(canvasId, labels, data, options = {}) {
@@ -484,7 +486,11 @@ const GleamTheme = {
         Chart.defaults.borderColor = this.current.border;
         if (this.chartInstances) {
             Object.values(this.chartInstances).forEach(c => {
-                if (c && typeof c.update === 'function') c.update();
+                try {
+                    if (c && c.canvas && typeof c.update === 'function') c.update('none');
+                } catch (e) {
+                    console.warn('Chart update error:', e);
+                }
             });
         }
     },
